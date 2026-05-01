@@ -1,0 +1,179 @@
+@extends('layouts.admin')
+@section('title')
+    Reviews
+@endsection
+@section('content')
+    <form method="POST"
+        action="{{ Route::is('admin.reviews.create') ? route('admin.reviews.store') : route('admin.reviews.update', ['review' => $review->id]) }}"
+        enctype="multipart/form-data" autocomplete="off" id="review-form">
+        @csrf
+        {{ Route::is('admin.reviews.create') ? '' : method_field('PUT') }}
+        <div class="row">
+            <div class="col-lg-12 d-flex align-items-stretch">
+                <div class="card w-100">
+                    <div class="card-header">
+                        <h5> {{ Route::is('admin.reviews.create') ? 'Create' : 'Edit' }} Review</h5>
+                    </div>
+                    <div class="card-body border-top">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <label class="control-label col-form-label">Product <sup class="text-danger">*</sup></label>
+                                <select class="form-control" name="product_id" id="product_id">
+                                    <option value="">Select Product</option>
+                                    @foreach ($products as $product)
+                                        <option value="{{ $product->id }}"
+                                            {{ isset($review) && $review->product_id == $product->id ? 'selected' : '' }}>
+                                            {{ $product->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div id="product_id-error" style="color:red"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="control-label col-form-label">
+                                    Title <sup class="tcul-star-restrict text-danger">*</sup>
+                                </label>
+                                <input type="text" class="form-control" name="title"
+                                    placeholder="Enter title name here"
+                                    value="{{ isset($review) ? $review->title : '' }}" />
+                                <div id="title-error" style="color:red"></div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <fieldset class="form-group">
+                                    <label class="control-label col-form-label">Photo</label>
+                                    <input type="file" name="photos[]" class="form-control" multiple accept="image/*">
+                                    <div id="photos-error" style="color:red"></div>
+                                </fieldset>
+                                @if (isset($review) && $review->photos)
+                                    <div class="mt-2 d-flex flex-wrap gap-2">
+                                        @foreach ($review->photos as $photo)
+                                            <div class="position-relative">
+                                                <img src="{{ asset(Storage::url($photo)) }}" width="100" height="100"
+                                                    class="img-thumbnail">
+                                                <span class="position-absolute top-0 end-0 badge bg-danger"
+                                                    onclick="deleteImage('{{ $photo }}', 'delete_photos')">&times;</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                            <input type="hidden" id="delete_photos" name="delete_photos">
+                            <div class="col-md-6">
+                                <label class="control-label col-form-label">
+                                    Select Rating <sup class="text-danger">*</sup>
+                                </label>
+                                <select class="form-control" name="rating">
+                                    <option value="">Select Rating</option>
+                                    <option value="1" {{ isset($review) && $review->rating == '1' ? 'selected' : '' }}>
+                                        1</option>
+                                    <option value="2"
+                                        {{ isset($review) && $review->rating == '2' ? 'selected' : '' }}>2</option>
+                                    <option value="3"
+                                        {{ isset($review) && $review->rating == '3' ? 'selected' : '' }}>3</option>
+                                    <option value="4"
+                                        {{ isset($review) && $review->rating == '4' ? 'selected' : '' }}>4</option>
+                                    <option value="5"
+                                        {{ isset($review) && $review->rating == '5' ? 'selected' : '' }}>5</option>
+                                </select>
+                                <div id="rating-error" style="color:red"></div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <fieldset class="form-group">
+                                    <label for="description" class="control-label col-form-label">Description</label>
+                                    <textarea name="description" class="form-control" rows="3" id="description" placeholder="Enter description here">{{ isset($review) ? $review->description : '' }}</textarea>
+                                    <div id="description-error" style="color:red"></div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary" id="submit-btn">
+                            <span class="spinner-span" role="status" aria-hidden="true"></span>
+                            <span class="save-btn-text">Save</span>
+                            &nbsp;
+                            <i class="ti ti-device-floppy"></i>
+                        </button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="{{ route('admin.reviews.index') }}" type="button" class="btn btn-secondary">
+                            Cancel
+                            &nbsp;
+                            <i class="ti ti-arrow-back-up-double"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script>
+        $('#review-form').submit(function(e) {
+            e.preventDefault();
+            $('#submit-btn').attr('disabled', true)
+            $('.spinner-span').addClass('spinner-border spinner-border-sm')
+
+            $('div[id$="-error"]').empty();
+            var form = $(this);
+            var url = form.attr('action');
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: new FormData(this),
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data) {
+                    if (data.status == 'success') {
+                        toastr.success(data.message, '', {
+                            showMethod: "slideDown",
+                            hideMethod: "slideUp",
+                            timeOut: 1500,
+                            closeButton: true,
+                        });
+                        setTimeout(function() {
+                            window.location.href = "{!! route('admin.reviews.index') !!}";
+                        }, 100);
+                    } else {
+                        $('#submit-btn').attr('disabled', false);
+                        $('.spinner-span').removeClass('spinner-border spinner-border-sm')
+                        toastr.error('There is some error!!', '', {
+                            showMethod: "slideDown",
+                            hideMethod: "slideUp",
+                            timeOut: 1500,
+                            closeButton: true,
+                        });
+                    }
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    $('#submit-btn').attr('disabled', false);
+                    $('.spinner-span').removeClass('spinner-border spinner-border-sm')
+                    toastr.error('There are some errors in Form. Please check your inputs', '', {
+                        showMethod: "slideDown",
+                        hideMethod: "slideUp",
+                        timeOut: 1500,
+                        closeButton: true,
+                    });
+                    $.each(xhr.responseJSON.errors, function(key, value) {
+                        $('#' + key + '-error').html(value);
+                    });
+                    $('html, body').animate({
+                        scrollTop: $('#' + Object.keys(xhr.responseJSON.errors)[0] + '-error')
+                            .offset().top - 200
+                    }, 500);
+                }
+            });
+        });
+
+        function deleteImage(image, inputFieldId) {
+            // Remove the image from the UI
+            $(`img[src$='${image}']`).closest('div.position-relative').remove();
+            // Add the deleted image to the hidden input field
+            let deletedImages = $(`#${inputFieldId}`).val();
+            deletedImages = deletedImages ? deletedImages.split(",") : [];
+            deletedImages.push(image);
+            $(`#${inputFieldId}`).val(deletedImages.join(","));
+        }
+    </script>
+@endsection

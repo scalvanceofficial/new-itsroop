@@ -1,0 +1,421 @@
+:root {
+    --primary: #000000;
+}
+
+.tcul-auth-modal {
+    max-width: 500px !important;
+    width: 100% !important;
+}
+
+.variant-picker-item .variant-picker-values input:checked+label.style-text:not(.color-btn) {
+    background-color: var(--primary) !important;
+}
+
+.variant-picker-item .variant-picker-values input:checked+label:not(.color-btn) {
+    border-color: var(--primary) !important;
+}
+
+.btn-fill {
+    background-color: var(--primary) !important;
+    border: 1px solid var(--primary) !important;
+}
+
+.floating-buttons {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 15px;
+    /* Space between buttons */
+    z-index: 1000;
+}
+
+/* WhatsApp Button Wrapper */
+.whatsapp-wrap {
+    right: 30px;
+    bottom: 140px;
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* WhatsApp Circular Design */
+.whatsapp-circle path {
+    transition: stroke-dashoffset 10ms linear 0s;
+    stroke-dasharray: 307.919, 307.919;
+    stroke-dashoffset: 0;
+    background-color: #25d366;
+    /* WhatsApp Green */
+    stroke-width: 5;
+    fill: #25d366;
+}
+
+/* WhatsApp Icon */
+.whatsapp-icon {
+    position: absolute;
+    font-size: 28px;
+    color: #fff;
+    right: 18px;
+    top: 27%;
+}
+
+.nav-sw.nav-next-slider.nav-next-collection {
+    color: #ffffff;
+    background-color: #000000;
+}
+
+.nav-sw.nav-prev-slider.nav-prev-collection {
+    color: #ffffff;
+    background-color: #000000;
+}
+
+.selected-category {
+    color: #000000 !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+}
+
+.selected-category-img {
+    border: 3px solid #000000;
+    border-radius: 50%;
+    padding: 3px;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+.bg_green-1 {
+    background-color: #000000 !important;
+}
+
+.text_white-2 {
+    color: #ffff !important;
+}
+
+.liveview-count {
+    background-color: #000000 !important;
+    color: white;
+    border: #000000 !important;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.tf-main-area-page p {
+    font-style: justify !important;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    font-size: 15px !important;
+    line-height: 24px !important;
+    color: #333333 !important;
+}
+
+.discount-percentage {
+    background-color: #000000 !important;
+    border-radius: 28px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 28px;
+    color: #ffffff;
+    white-space: nowrap;
+    /* Prevents content wrapping */
+}
+
+@media (max-width: 768px) {
+    .discount-percentage {
+        padding: 0 8px;
+        font-size: 11px;
+        line-height: 26px;
+        border-radius: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .discount-percentage {
+        padding: 0 6px;
+        font-size: 10px;
+        line-height: 24px;
+        border-radius: 20px;
+    }
+}
+
+/* about us for home page */
+.tf-content-wrap .heading {
+    font-size: 38px !important;
+    line-height: 62.4px;
+}
+
+.tf-social-icon .box-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: transform 0.3s ease;
+    text-decoration: none;
+}
+
+.tf-social-icon .box-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Specific brand colors */
+.social-facebook {
+    background-color: #1877f2;
+}
+
+.social-instagram {
+    background: radial-gradient(circle at 30% 107%,
+            #fdf497 0%,
+            #fdf497 5%,
+            #fd5949 45%,
+            #d6249f 60%,
+            #285aeb 90%);
+}
+
+.social-pinterest {
+    background-color: #25d366;
+    /* WhatsApp green */
+}
+
+.tf-social-icon i {
+    font-size: 16px;
+}
+
+@media (max-width: 480px) {
+    .tf-content-wrap .heading {
+        font-size: 28px !important;
+        /* Adjust for smaller screens */
+        line-height: 1.4;
+        /* Adjust line height for better readability on mobile */
+        padding: 0 10px;
+        /* Prevent text from touching the edges */
+    }
+}
+
+/* article page */
+.tf-content-wrap .main-heading {
+    font-size: 26px !important;
+    /* Updated font size */
+    line-height: 45px;
+    /* Updated line height */
+    text-align: center;
+    /* Center the heading */
+    color: #000000;
+    /* Deep green text */
+}
+
+/* products  */
+@media (max-width: 480px) {
+    .tf-product-info-price {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .price-on-sale,
+    .compare-at-price {
+        margin-right: 8px;
+    }
+
+    .discount-percentage {
+        margin-top: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 4px;
+        padding: 2px 10px;
+        background-color: #000000 !important;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1.2;
+        color: #ffffff;
+        width: auto;
+    }
+}
+
+/* catgeory scrolling */
+@media (max-width: 480px) {
+    .tf-categories-container {
+        display: flex;
+        overflow-x: auto;
+        gap: 2px;
+    }
+
+    .collection-item-circle {
+        flex: 0 0 auto;
+        width: 100px;
+        /* Adjust as needed */
+    }
+}
+
+.tf-table-page-cart td:last-child {
+    width: 100% !important;
+}
+
+@media (min-width: 1150px) {
+    .tf-accordion-wrap>.content {
+        width: 100% !important;
+    }
+}
+
+.justify-text {
+    text-align: justify;
+}
+
+.tf-page-title {
+    margin-top: 80px;
+}
+
+.slider-title {
+    font-size: 58px;
+    line-height: 1.2;
+    max-width: 600px;
+    word-break: break-word;
+}
+
+@media (max-width: 1024px) {
+    .slider-title {
+        font-size: 32px;
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    .slider-title {
+        font-size: 24px;
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    .slider-title {
+        font-size: 20px;
+        line-height: 1.3;
+    }
+}
+
+@media (max-width: 768px) {
+    .tf-product-media-thumbs {
+        order: 2;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .tf-product-media-thumbs .swiper-wrapper {
+        flex-direction: row !important;
+    }
+
+    .tf-product-media-thumbs .swiper-slide {
+        width: 70px !important;
+        height: 70px !important;
+    }
+
+    .thumbs-slider {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.footer .footer-newsletter form .button-submit {
+    position: absolute !important;
+    top: -22px !important;
+    right: 2px !important;
+}
+
+/* Shop Gram image fixed size */
+.wrap-shop-gram .img-style {
+    width: 214px;
+    height: 257px;
+    overflow: hidden;
+    margin: 0 auto;
+    /* center inside slide */
+    position: relative;
+}
+
+/* Image fit */
+.wrap-shop-gram .img-style img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* no stretching */
+    display: block;
+}
+
+/* Center swiper items */
+.tf-sw-shop-gallery .swiper-slide {
+    display: flex;
+    justify-content: center;
+}
+
+/* Keep hover effect smooth */
+.wrap-shop-gram .hover-img img {
+    transition: 0.3s ease;
+}
+
+.wrap-shop-gram .hover-img:hover img {
+    transform: scale(1.05);
+}
+
+/* Fix Quick Add button position */
+.wrap-shop-gram .box-icon {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+/* Responsive (recommended) */
+@media (max-width: 768px) {
+    .wrap-shop-gram .img-style {
+        width: 100%;
+        height: 220px;
+    }
+}
+
+/* Collection Image Wrapper */
+.collection-item .collection-image {
+    display: block;
+    width: 100%;
+    height: 420px;
+    /* fixed height for all images */
+    overflow: hidden;
+    border-radius: 10px;
+    /* optional */
+}
+
+/* Image Styling */
+.collection-item .collection-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* ensures image fills without distortion */
+    transition: 0.3s ease;
+}
+
+/* Hover Effect (optional) */
+.collection-item:hover .collection-image img {
+    transform: scale(1.05);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .collection-item .collection-image {
+        height: 180px;
+    }
+}
+
+@media (max-width: 576px) {
+    .collection-item .collection-image {
+        height: 150px;
+    }
+}
