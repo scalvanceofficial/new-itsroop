@@ -27,7 +27,6 @@
                     @endif
                     <a href="javascript:void(0);" class="box-icon product-wishlist {{ $product->is_wishlisted ? 'active' : '' }}" data-id="{{ $product->id }}">
                         <span class="icon icon-heart"></span>
-                        <span class="icon icon-delete"></span>
                     </a>
                 </div>
 
@@ -49,7 +48,6 @@
                         <span class="price-on-sale">{{ toCurrency($product_price->selling_price) }}</span>
                         @if ($product_price->discount_percentage > 0 || $product_price->discount_price > 0)
                             <span class="compare-at-price">{{ toCurrency($product_price->actual_price) }}</span>
-                            <span class="discount-percentage">{{ round($product_price->discount_percentage) }}% OFF</span>
                         @endif
                     @endif
                 </div>

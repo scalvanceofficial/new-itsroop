@@ -26,13 +26,13 @@
                         <p>info@itsroop.com</p>
                     </div>
                     <div>
-                        <ul class="tf-social-icon d-flex gap-20 style-default contact-social">
-                            <li><a href="#" class="social-icon-bw"><i class="icon fs-14 icon-fb"></i></a></li>
-                            <li><a href="#" class="social-icon-bw"><i class="icon fs-12 icon-Icon-x"></i></a></li>
-                            <li><a href="#" class="social-icon-bw"><i class="icon fs-14 icon-instagram"></i></a></li>
-                            <li><a href="#" class="social-icon-bw"><i class="icon fs-14 icon-tiktok"></i></a></li>
-                            <li><a href="#" class="social-icon-bw"><i class="icon fs-14 icon-pinterest-1"></i></a></li>
-                        </ul>
+                        <ul class="tf-social-icon d-flex gap-10">
+                                        <li><a href="#" class="social-icon-footer" contenteditable="false" style="cursor: pointer;"><i class="icon fs-14 icon-fb"></i></a></li>
+                                        <li><a href="#" class="social-icon-footer" contenteditable="false" style="cursor: pointer;"><i class="icon fs-14 icon-instagram"></i></a></li>
+                                        <li><a href="#" class="social-icon-footer" contenteditable="false" style="cursor: pointer;"><i class="icon fs-12 icon-Icon-x"></i></a></li>
+                                        <li><a href="#" class="social-icon-footer" contenteditable="false" style="cursor: pointer;"><i class="icon fs-14 icon-tiktok"></i></a></li>
+                                        <li><a href="#" class="social-icon-footer" contenteditable="false" style="cursor: pointer;"><i class="icon fs-14 icon-pinterest-1"></i></a></li>
+                                    </ul>
                     </div>
                     <style>
                         .social-icon-bw {

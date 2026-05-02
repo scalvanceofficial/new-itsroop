@@ -31,7 +31,6 @@
                 <span class="tooltip" id="wishlist-tooltip-{{ $product->id }}">
                     {{ $product->is_wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist' }}
                 </span>
-                <span class="icon icon-delete"></span>
             </a>
         </div>
         @php $size_property_values = getProductPropertyValues($product->id, 'Size') @endphp

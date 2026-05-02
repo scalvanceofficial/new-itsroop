@@ -11,7 +11,7 @@
     :root {
         --cream:   #F7F4EF;
         --ink:     #1C1C1C;
-        --sage:    #36614B;
+        --sage:    #000000ff;
         --sage-lt: #EAF0EC;
         --dust:    #D9D0C5;
         --white:   #FFFFFF;
@@ -590,7 +590,6 @@
                                 @endif
                                 <a href="javascript:void(0);" class="box-icon product-wishlist {{ $product->is_wishlisted ? 'active' : '' }}" data-id="{{ $product->id }}">
                                     <span class="icon icon-heart"></span>
-                                    <span class="icon icon-delete"></span>
                                 </a>
                             </div>
 
@@ -612,7 +611,6 @@
                                     <span class="price-on-sale">{{ toCurrency($product_price->selling_price) }}</span>
                                     @if ($product_price->discount_percentage > 0 || $product_price->discount_price > 0)
                                         <span class="compare-at-price">{{ toCurrency($product_price->actual_price) }}</span>
-                                        <span class="discount-percentage">{{ round($product_price->discount_percentage) }}% OFF</span>
                                     @endif
                                 @endif
                             </div>
@@ -631,7 +629,7 @@
             @else
             <div id="products-container">
                 <div class="empty-state">
-                    <svg width="64" height="64" fill="none" stroke="#36614B" stroke-width="1.5" viewBox="0 0 24 24">
+                    <svg width="64" height="64" fill="none" stroke="#000000ff" stroke-width="1.5" viewBox="0 0 24 24">
                         <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
                         <path d="M16 10a4 4 0 01-8 0"/>
                     </svg>
