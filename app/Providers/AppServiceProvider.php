@@ -29,9 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         view()->composer('layouts.frontend', function ($view) {
             $categories = \App\Models\Category::where('status', 'ACTIVE')
-                ->where('show_in_navbar', true)
                 ->orderBy('index')
-                ->take(4)
                 ->get();
 
             foreach ($categories as $category) {
@@ -43,9 +41,7 @@ class AppServiceProvider extends ServiceProvider
                 
                 // Fetch subcategories for each category if needed
                 $category->menu_subcategories = \App\Models\SubCategory::where('status', 'ACTIVE')
-                    ->where('show_in_navbar', true)
                     ->where('category_id', $category->id)
-                    ->take(5)
                     ->get();
             }
 
