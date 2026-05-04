@@ -433,6 +433,8 @@
 
     $('#shiprocketOrderForm').on('submit', function(e) {
       e.preventDefault();
+      var btn = $(this).find('button[type="submit"]');
+      btn.prop('disabled', true);
 
       var formData = $(this).serialize();
 
@@ -447,8 +449,10 @@
           toastr.success(response.message);
           $('#shiprocketOrderModal').modal('hide');
           $('#datatable').DataTable().draw(false);
+          btn.prop('disabled', false);
         },
         error: function(xhr, status, error) {
+          btn.prop('disabled', false);
           if (xhr.responseJSON && xhr.responseJSON.status == "error") {
             toastr.error(xhr.responseJSON.message);
           }
@@ -517,6 +521,8 @@
 
     $('#trackingUpdateOrderForm').on('submit', function(e) {
       e.preventDefault();
+      var btn = $(this).find('button[type="submit"]');
+      btn.prop('disabled', true);
 
       var formData = $(this).serialize();
       $.ajax({
@@ -530,8 +536,10 @@
           toastr.success(response.message);
           $('#trackingUpdateOrderModal').modal('hide');
           $('#datatable').DataTable().draw(false);
+          btn.prop('disabled', false);
         },
         error: function(xhr, status, error) {
+          btn.prop('disabled', false);
           $('.text-danger').html(''); 
           if(xhr.responseJSON.errors) {
               $.each(xhr.responseJSON.errors, function(key, value) {

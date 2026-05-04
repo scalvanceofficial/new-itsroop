@@ -21,6 +21,7 @@ class ProfileController extends Controller
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'mobile' => 'required|numeric|digits:10|unique:users,mobile,' . Auth::id(),
         ]);
 
         $user = Auth::user();

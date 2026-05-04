@@ -347,7 +347,9 @@ class ProductController extends Controller
             return response()->json(['error' => 'This coupon is not valid for ' . $currencyCode], 400);
         }
 
-        if ($totalAmount < $coupon->minimum_order_amount) {
+        $totalInCouponCurrency = convertToCurrency($totalAmount, $coupon->currency_code);
+
+        if ($totalInCouponCurrency < $coupon->minimum_order_amount) {
             return response()->json(['error' => 'Minimum order value should be ' . formatCurrency($coupon->minimum_order_amount, $coupon->currency_code)], 400);
         }
 
@@ -362,8 +364,8 @@ class ProductController extends Controller
             'final_price' => $finalAmount,
             'discount_percentage' => $discountPercentage,
             'discount_amount' => $discountAmount,
-            'formatted_discount_amount' => formatCurrency($discountAmount, $currencyCode),
-            'formatted_final_price' => formatCurrency($finalAmount, $currencyCode),
+            'formatted_discount_amount' => toCurrency($discountAmount, $currencyCode),
+            'formatted_final_price' => toCurrency($finalAmount, $currencyCode),
         ]);
     }
 

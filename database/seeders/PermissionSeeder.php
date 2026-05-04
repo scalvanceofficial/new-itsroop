@@ -23,77 +23,6 @@ class PermissionSeeder extends Seeder
                 ],
             ]
         ],
-        'Role' => [
-            'controller' => 'Admin\RoleController',
-            'permissions' => [
-                'role-view' => [
-                    'index',
-                    'data',
-                    'list',
-                    'show',
-                ],
-                'role-store' => [
-                    'create',
-                    'store',
-                ],
-                'role-update' => [
-                    'edit',
-                    'update',
-                    'changeStatus',
-                ],
-                'role-permission' => [
-                    'permissionsShow',
-                    'permissionsUpdate',
-                ],
-            ]
-        ],
-        'Order' => [
-            'controller' => 'Admin\OrderController',
-            'permissions' => [
-                'order-view' => [
-                    'index',
-                    'data',
-                    'list',
-                    'show',
-                    'getDataPage',
-                    'updateDataPage',
-                    'pdf',
-                ],
-                'order-store' => [
-                    'create',
-                    'store',
-                ],
-                'order-update' => [
-                    'edit',
-                    'update',
-                    'changeStatus',
-                ],
-            ]
-        ],
-        'Role' => [
-            'controller' => 'Admin\RoleController',
-            'permissions' => [
-                'roles-view' => [
-                    'index',
-                    'data',
-                    'list',
-                    'show',
-                ],
-                'roles-store' => [
-                    'create',
-                    'store',
-                ],
-                'roles-update' => [
-                    'edit',
-                    'update',
-                    'changeStatus',
-                ],
-                'roles-permission' => [
-                    'permissionsShow',
-                    'permissionsUpdate',
-                ],
-            ]
-        ],
         'Employee' => [
             'controller' => 'Admin\EmployeeController',
             'permissions' => [
@@ -317,6 +246,10 @@ class PermissionSeeder extends Seeder
                 'orders-view' => [
                     'index',
                     'data',
+                    'list',
+                    'show',
+                    'getDataPage',
+                    'updateDataPage',
                     'pdf',
                     'export',
                 ],
@@ -534,11 +467,6 @@ class PermissionSeeder extends Seeder
             'customers-view',
             'customers-store',
             'customers-update',
-
-            #Slider
-            'slider-view',
-            'slider-store',
-            'slider-update',
 
             #Order
             'orders-view',

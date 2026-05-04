@@ -648,7 +648,21 @@
                         <div id="dropdown-menu-shop" class="collapse">
                             <ul class="sub-nav-menu">
                                 @foreach($menu_categories ?? [] as $category)
-                                    <li><a href="{{ route('frontend.products', ['category_slug' => $category->slug ?? '']) }}" class="sub-nav-link text-capitalize">{{ $category->name ?? '' }}</a></li>
+                                    <li>
+                                        <a href="#sub-menu-cat-{{ $category->id }}" class="collapsed mb-menu-link"
+                                            data-bs-toggle="collapse" aria-expanded="false" aria-controls="sub-menu-cat-{{ $category->id }}">
+                                            <span>{{ $category->name }}</span>
+                                            <span class="btn-open-sub"></span>
+                                        </a>
+                                        <div id="sub-menu-cat-{{ $category->id }}" class="collapse">
+                                            <ul class="sub-nav-menu ms-3">
+                                                <li><a href="{{ route('frontend.products', ['category_slug' => $category->slug]) }}" class="sub-nav-link text-primary">View All {{ $category->name }}</a></li>
+                                                @foreach($category->menu_subcategories ?? [] as $sub)
+                                                    <li><a href="{{ route('frontend.products', ['category_slug' => $category->slug, 'sub_category' => $sub->name]) }}" class="sub-nav-link">{{ $sub->name }}</a></li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>
@@ -662,7 +676,21 @@
                         <div id="dropdown-menu-products" class="collapse">
                             <ul class="sub-nav-menu">
                                 @foreach($menu_subcategories ?? [] as $subCategory)
-                                    <li><a href="{{ route('frontend.products', ['category_slug' => optional($subCategory->category)->slug ?? 'all', 'sub_category' => $subCategory->name ?? '']) }}" class="sub-nav-link text-capitalize">{{ $subCategory->name ?? '' }}</a></li>
+                                    <li>
+                                        <a href="#sub-menu-subcat-{{ $subCategory->id }}" class="collapsed mb-menu-link"
+                                            data-bs-toggle="collapse" aria-expanded="false" aria-controls="sub-menu-subcat-{{ $subCategory->id }}">
+                                            <span>{{ $subCategory->name }}</span>
+                                            <span class="btn-open-sub"></span>
+                                        </a>
+                                        <div id="sub-menu-subcat-{{ $subCategory->id }}" class="collapse">
+                                            <ul class="sub-nav-menu ms-3">
+                                                <li><a href="{{ route('frontend.products', ['category_slug' => optional($subCategory->category)->slug ?? 'all', 'sub_category' => $subCategory->name]) }}" class="sub-nav-link text-primary">View All {{ $subCategory->name }}</a></li>
+                                                @foreach($subCategory->menu_products ?? [] as $product)
+                                                    <li><a href="{{ route('frontend.products.product-details', ['slug' => $product->slug]) }}" class="sub-nav-link">{{ $product->name }}</a></li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>

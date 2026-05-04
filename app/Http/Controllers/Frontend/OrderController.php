@@ -59,10 +59,31 @@ class OrderController extends Controller
             Stripe::setApiKey($stripeSecret);
 
             $coupon = null;
+            $discount_percentage = 0;
             if (!empty($validated['coupon_code_id'])) {
-                $coupon = \App\Models\CouponCode::find($validated['coupon_code_id']);
+                $coupon = \App\Models\CouponCode::where('id', $validated['coupon_code_id'])
+                    ->where('status', 'ACTIVE')
+                    ->whereDate('start_date', '<=', now())
+                    ->whereDate('end_date', '>=', now())
+                    ->first();
+                
+                if ($coupon) {
+                    // Calculate current total in GBP
+                    $currentTotalGbp = 0;
+                    foreach ($user->carts as $cart) {
+                        $cart_data = getCartData($cart);
+                        $currentTotalGbp += $cart_data['price'] * $cart->quantity;
+                    }
+
+                    $totalInCouponCurrency = convertToCurrency($currentTotalGbp, $coupon->currency_code);
+
+                    if ($totalInCouponCurrency >= $coupon->minimum_order_amount) {
+                        $discount_percentage = $coupon->percentage ?? 0;
+                    } else {
+                        $coupon = null; // Minimum amount not met
+                    }
+                }
             }
-            $discount_percentage = $coupon ? ($coupon->percentage ?? 0) : 0;
 
             $line_items = [];
             foreach ($user->carts as $cart) {
@@ -157,7 +178,7 @@ class OrderController extends Controller
                 'stripe_session_id'        => $session->id,
                 'stripe_payment_intent_id' => $session->payment_intent,
                 'shiprocket_status'        => 'NEW',
-                'gst'                      => ($session->amount_total / 100 / 1.18) * 0.18,
+                'gst'                      => (($session->amount_total / 100) / $metadata->rate / 1.18) * 0.18,
                 'total_amount'             => ($session->amount_total / 100) / $metadata->rate, // Store in base currency GBP
                 'currency_code'            => $metadata->currency ?? 'GBP',
                 'exchange_rate'            => $metadata->rate ?? 1.0,
@@ -184,7 +205,7 @@ class OrderController extends Controller
                     'property_value_names' => $cart_data['property_values'],
                     'quantity'             => $cart->quantity,
                     'price'                => $discounted_price,
-                    'gst'                  => $discounted_price * 0.18,
+                    'gst'                  => ($discounted_price / 1.18) * 0.18,
                     'total_amount'         => $cart->quantity * $discounted_price,
                     'coupon_code_id'       => $metadata->coupon_code_id,
                 ]);
@@ -201,6 +222,12 @@ class OrderController extends Controller
                     $productPrice->save();
                 }
             }
+
+            \App\Models\OrderTrackingHistory::create([
+                'order_id' => $order->id,
+                'status' => 'Pending',
+                'note' => 'Order placed successfully',
+            ]);
 
             Cart::where('user_id', $user->id)->delete();
 

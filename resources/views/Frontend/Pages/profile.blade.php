@@ -41,9 +41,10 @@
                                     <label class="tf-field-label fw-4 text_black-2" for="email">Email</label>
                                 </div>
                                 <div class="tf-field style-1 mb_15">
-                                    <input class="tf-field-input tf-input" placeholder=" " type="email" id="mobile"
-                                        name="mobile" value="{{ isset($user) ? $user->mobile : '' }}" disabled>
+                                    <input class="tf-field-input tf-input" placeholder=" " type="text" id="mobile"
+                                        name="mobile" value="{{ isset($user) ? $user->mobile : '' }}">
                                     <label class="tf-field-label fw-4 text_black-2" for="mobile">Mobile</label>
+                                    <span id="mobile_error" style="color:red;"></span>
                                 </div>
                                 <div class="mb_20">
                                     <button type="submit"
@@ -64,6 +65,7 @@
             e.preventDefault();
             $('#first_name_error').empty();
             $('#last_name_error').empty();
+            $('#mobile_error').empty();
 
             var form = $(this);
             var url = form.attr('action');

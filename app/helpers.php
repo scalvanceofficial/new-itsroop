@@ -106,6 +106,25 @@ function toCurrency($amountGbp, $selected = null): string
 }
 
 /**
+ * Convert a price (stored in GBP base) into a specific currency numeric value.
+ */
+function convertToCurrency($amountGbp, $currencyCode): float
+{
+    $currency = \Illuminate\Support\Facades\Cache::remember('currency_' . $currencyCode, 3600, function () use ($currencyCode) {
+        return \App\Models\Currency::where('code', $currencyCode)->where('is_active', true)->first();
+    });
+
+    if (!$currency) {
+        $currency = \Illuminate\Support\Facades\Cache::remember('currency_GBP', 3600, function () {
+            return \App\Models\Currency::where('code', 'GBP')->first();
+        });
+    }
+
+    $rate = $currency ? $currency->exchange_rate : 1.0;
+    return (float) $amountGbp * $rate;
+}
+
+/**
  * Get the current currency symbol.
  */
 function getCurrencySymbol(): string

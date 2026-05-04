@@ -227,11 +227,17 @@ class OrderController extends Controller
             'estimated_delivery_date' => $estimatedDate,
         ]);
 
-        \App\Models\OrderTrackingHistory::create([
-            'order_id' => $order->id,
-            'status' => $request->status,
-            'note' => $request->note,
-        ]);
+        $lastHistory = \App\Models\OrderTrackingHistory::where('order_id', $order->id)
+            ->latest()
+            ->first();
+
+        if (!$lastHistory || $lastHistory->status !== $request->status || $lastHistory->note !== $request->note) {
+            \App\Models\OrderTrackingHistory::create([
+                'order_id' => $order->id,
+                'status' => $request->status,
+                'note' => $request->note,
+            ]);
+        }
 
         return response()->json([
             'status' => 'success',
