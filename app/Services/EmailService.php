@@ -17,11 +17,15 @@ class EmailService
      */
     public static function sendEmail($to, $blade_template, $data, $attachment = null)
     {
-        // Send to customer
-        Mail::to($to)->send(new SendMail($data, $blade_template, $attachment));
+        try {
+            // Send to customer
+            Mail::to($to)->send(new SendMail($data, $blade_template, $attachment));
 
-        // Send copy to admin
-        $adminEmail = config('mail.from.address'); // Using the from address as admin email for now
-        Mail::to($adminEmail)->send(new SendMail($data, $blade_template, $attachment));
+            // Send copy to admin
+            $adminEmail = config('mail.from.address'); // Using the from address as admin email for now
+            Mail::to($adminEmail)->send(new SendMail($data, $blade_template, $attachment));
+        } catch (\Exception $e) {
+            \Log::error("Failed to send email to $to: " . $e->getMessage());
+        }
     }
 }

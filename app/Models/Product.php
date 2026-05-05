@@ -129,9 +129,18 @@ class Product extends BaseModel
 
     public function getPrimaryPriceAttribute()
     {
-        return $this->productPrices()
-            ->whereJsonContains('property_values', $this->primary_property_values)
-            ->first();
+        $primary_property_values = $this->primary_property_values;
+
+        if (!empty($primary_property_values)) {
+            $price = $this->productPrices()
+                ->whereJsonContains('property_values', $primary_property_values)
+                ->first();
+            if ($price) {
+                return $price;
+            }
+        }
+
+        return $this->productPrices()->first();
     }
 
     public function getPrice(array $property_values = [])

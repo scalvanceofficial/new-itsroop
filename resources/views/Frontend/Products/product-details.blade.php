@@ -550,15 +550,37 @@
                                     <h5>{{ $product->name }}</h5>
                                 </div>
                                 <div class="tf-product-info-price">
-                                    <div class="price-on-sale text_black" id="sellingPrice"></div>
-                                    <div class="compare-at-price" id="actualPrice"></div>
-                                    <div class="discount-percentage" id="discountPercentage"></div>
+                                    @php
+                                        $initial_price = $product->getPrice();
+                                    @endphp
+                                    <div class="price-on-sale text_black" id="sellingPrice">
+                                        {{ $initial_price ? toCurrency($initial_price->selling_price) : '' }}
+                                    </div>
+                                    <div class="compare-at-price" id="actualPrice">
+                                        {{ $initial_price && $initial_price->actual_price > $initial_price->selling_price ? toCurrency($initial_price->actual_price) : '' }}
+                                    </div>
+                                    <div class="discount-percentage" id="discountPercentage">
+                                        @if ($initial_price && $initial_price->discount_percentage > 0)
+                                            <span>{{ round($initial_price->discount_percentage) }}</span>% OFF
+                                        @endif
+                                    </div>
                                 </div>
                                 <div>
                                     <h6 class="fw-6">{{ $product->tag_line }}</h6>
                                 </div>
-                                <div class="tf-product-info-liveview">
-                                    <div class="liveview-count" id="productStock">0</div>
+                                <div class="tf-product-info-liveview"
+                                    {!! $initial_price && $initial_price->stock > 1 ? 'style="display: none;"' : '' !!}>
+                                    @if ($initial_price)
+                                        @if ($initial_price->stock == 0)
+                                            <div class="liveview-count" id="productStock">Out of Stock</div>
+                                        @elseif ($initial_price->stock == 1)
+                                            <div class="liveview-count" id="productStock">Only 1 item left in stock</div>
+                                        @else
+                                            <div class="liveview-count" id="productStock">0</div>
+                                        @endif
+                                    @else
+                                        <div class="liveview-count" id="productStock">0</div>
+                                    @endif
                                     <p class="fw-6" id="stockStatus"></p>
                                 </div>
 
@@ -623,7 +645,9 @@
                                             class="tf-btn btn-fill justify-content-center fw-6 fs-16 flex-grow-1 animate-hover-btn btn-add-to-cart add-to-cart-btn"
                                             data-id="{{ $product->id }}">
                                             <span class="cart-btn-text">Add to cart -&nbsp;</span>
-                                            <span class="tf-qty-price total-price" id="totalAmount"></span>
+                                            <span class="tf-qty-price total-price" id="totalAmount">
+                                                {{ $initial_price ? toCurrency($initial_price->selling_price) : '' }}
+                                            </span>
                                         </a>
                                         <a href="javascript:void(0);"
                                             class="tf-product-btn-wishlist hover-tooltip box-icon bg_white btn-icon-action tf-btn-loading product-wishlist {{ $product->is_wishlisted ? 'active' : '' }}"

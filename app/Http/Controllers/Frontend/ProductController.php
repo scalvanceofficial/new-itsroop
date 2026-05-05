@@ -150,11 +150,12 @@ class ProductController extends Controller
 
     public function getProductPrice(Request $request, Product $product)
     {
-        $property_value_id = (int) ($request->property_values[0]['property_value_id'] ?? 0);
+        $property_value_ids = [];
+        if ($request->has('property_values') && is_array($request->property_values)) {
+            $property_value_ids = array_column($request->property_values, 'property_value_id');
+        }
 
-        $product_price = ProductPrice::where('product_id', $product->id)
-            ->whereJsonContains('property_values', $property_value_id)
-            ->first();
+        $product_price = $product->getPrice($property_value_ids);
 
         if (!$product_price) {
              return response()->json(['error' => 'Price not found'], 404);

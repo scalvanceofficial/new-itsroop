@@ -118,8 +118,8 @@ Orders | Itsroop
             <div class="card info-card">
                 <small>Delivery</small>
                 <h6>
-                    {{ $order->estimated_delivery_date 
-                        ? toIndianDate($order->estimated_delivery_date) 
+                    {{ $order->estimated_delivery_date
+                        ? toIndianDate($order->estimated_delivery_date)
                         : toIndianDate($order->created_at->addDays(7)) }}
                 </h6>
             </div>
@@ -212,7 +212,16 @@ Orders | Itsroop
     </div>
 
     <!-- Products -->
-    @php $total_price = 0; @endphp
+    @php
+        $total_price = 0;
+
+        // Get delivered datetime from tracking activity for accurate return window
+        $delivered_activity   = $tracking_activities->firstWhere('status', 'Delivered');
+        $delivered_at         = $delivered_activity ? $delivered_activity->created_at : $order->updated_at;
+        $days_since_delivered = $delivered_at->diffInDays(now());
+        $return_deadline      = $delivered_at->copy()->addDays(7);
+        $return_window_open   = $order->status == 'Delivered' && $days_since_delivered <= 7;
+    @endphp
 
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
@@ -221,8 +230,10 @@ Orders | Itsroop
             @foreach ($order->products as $order_product)
 
                 @php
-                    $product_image = $order_product->product->getImage($order_product->property_values);
-                    $total_price += $order_product->price * $order_product->quantity;
+                    $product_image    = $order_product->product->getImage($order_product->property_values);
+                    $total_price     += $order_product->price * $order_product->quantity;
+                    $product_quantity = $order_product->quantity;
+                    $returned_product = $order_product->returnedProduct;
                 @endphp
 
                 <div class="card product-card mb-3 border-0 shadow-sm">
@@ -236,12 +247,7 @@ Orders | Itsroop
                             <small>Qty: {{ $order_product->quantity }}</small><br>
                             <strong>Total: {{ toCurrency($order_product->total_amount) }}</strong>
 
-                            <!-- RETURN LOGIC SAME -->
-                            @php
-                                $product_quantity = $order_product->quantity;
-                                $returned_product = $order_product->returnedProduct;
-                            @endphp
-
+                            <!-- Return badge if already returned -->
                             @if ($returned_product && $returned_product->return_quantity > 0)
                                 <div class="mt-2">
                                     <span class="badge bg-info">
@@ -251,15 +257,40 @@ Orders | Itsroop
                                 </div>
                             @endif
 
-                            @if ($order->status == 'Delivered' && $order->updated_at->diffInDays() <= 7 && (!$returned_product || $returned_product->return_quantity < $product_quantity))
-                                <button class="btn btn-outline-warning btn-sm mt-2 return-btn" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#returnProductModal"
-                                        data-id="{{ $order_product->id }}" 
-                                        data-max="{{ $product_quantity - ($returned_product->return_quantity ?? 0) }}"
-                                        data-name="{{ $order_product->product->name }}">
-                                    Return Product
-                                </button>
+                            <!-- Return button / window status -->
+                            @if ($order->status == 'Delivered')
+
+                                @if ($return_window_open && (!$returned_product || $returned_product->return_quantity < $product_quantity))
+                                    {{-- Window is open: show button + static deadline line + live countdown --}}
+                                    <div class="mt-2">
+                                        <button class="btn btn-outline-warning btn-sm return-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#returnProductModal"
+                                                data-id="{{ $order_product->id }}"
+                                                data-max="{{ $product_quantity - ($returned_product->return_quantity ?? 0) }}"
+                                                data-name="{{ $order_product->product->name }}">
+                                            <i class="fas fa-undo me-1"></i> Return Product
+                                        </button>
+                                        <small class="text-muted d-block mt-1">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Return window closes on {{ $return_deadline->format('d M Y') }}
+                                        </small>
+                                        <small class="text-warning d-block mt-1 fw-bold countdown-timer"
+                                               data-deadline="{{ $return_deadline->toIso8601String() }}">
+                                        </small>
+                                    </div>
+
+                                @elseif (!$return_window_open && (!$returned_product || $returned_product->return_quantity == 0))
+                                    {{-- Window closed and no return was made --}}
+                                    <div class="mt-2">
+                                        <small class="text-danger">
+                                            <i class="fas fa-times-circle me-1"></i>
+                                            Return window closed on {{ $return_deadline->format('d M Y') }}
+                                        </small>
+                                    </div>
+
+                                @endif
+
                             @endif
 
                         </div>
@@ -279,7 +310,7 @@ Orders | Itsroop
     <div class="card shadow-sm border-0">
         <div class="card-body">
 
-            @if ($order->status != 'Delivered' && $order->status != 'Cancelled' && $order->created_at->diffInHours() < 24 && $order->shiprocket_status == 'NEW')
+            @if ($order->status != 'Delivered' && $order->status != 'Cancelled' && $order->status != 'Shipped' && $order->created_at->diffInHours() < 24 && $order->shiprocket_status == 'NEW')
                 <div class="alert alert-info">
                     <h6>Cancel Available</h6>
                     <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
@@ -288,6 +319,10 @@ Orders | Itsroop
                 </div>
             @elseif($order->status == 'Delivered')
                 <div class="alert alert-success">Order Delivered</div>
+            @elseif($order->status == 'Shipped')
+                <div class="alert alert-info">
+                    <i class="fas fa-truck me-2"></i> Your order has been shipped. Cancellation is no longer available.
+                </div>
             @elseif($order->status == 'Cancelled' || $order->shiprocket_status == 'Cancelled')
                 <div class="alert alert-warning">Order Cancelled</div>
             @else
@@ -353,6 +388,42 @@ Orders | Itsroop
 
 <script>
 $(document).ready(function() {
+
+    // ── Live countdown timers ──────────────────────────────────────────────
+    function startCountdowns() {
+        document.querySelectorAll('.countdown-timer').forEach(function(el) {
+            const deadline = new Date(el.getAttribute('data-deadline')).getTime();
+
+            function tick() {
+                const diff = deadline - Date.now();
+
+                if (diff <= 0) {
+                    el.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Return window has expired</span>';
+                    return;
+                }
+
+                const days    = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours   = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                el.innerHTML =
+                    '<i class="fas fa-hourglass-half me-1"></i>' +
+                    days    + 'd ' +
+                    hours   + 'h ' +
+                    minutes + 'm ' +
+                    seconds + 's remaining';
+
+                setTimeout(tick, 1000);
+            }
+
+            tick();
+        });
+    }
+
+    startCountdowns();
+
+    // ── Cancel order ───────────────────────────────────────────────────────
     $('#cancelOrderForm').on('submit', function(e) {
         e.preventDefault();
         $.post($(this).attr('action'), $(this).serialize(), function(response){
@@ -363,12 +434,14 @@ $(document).ready(function() {
         });
     });
 
+    // ── Return modal setup ─────────────────────────────────────────────────
     $('.return-btn').on('click', function() {
         $('#return_order_product_id').val($(this).data('id'));
         $('#return_product_name').text($(this).data('name'));
         $('#return_qty_input').attr('max', $(this).data('max'));
     });
 
+    // ── Return form submit ─────────────────────────────────────────────────
     $('#returnOrderForm').on('submit', function(e) {
         e.preventDefault();
         $.post($(this).attr('action'), $(this).serialize(), function(response){
@@ -380,6 +453,7 @@ $(document).ready(function() {
             toastr.error(xhr.responseJSON.message || 'Something went wrong.');
         });
     });
+
 });
 </script>
 
