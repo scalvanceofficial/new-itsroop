@@ -22,7 +22,7 @@ class Thankyou extends Mailable
     public function build()
     {
         return $this->markdown('emails.thankyou')
-            ->from("scalvance.official@gmail.com", "Itsroop")
+            ->from("itsroop@outlook.com", "Itsroop")
             ->subject("Itsroop - Thank You for Contacting Us")
             ->with([
                 'enquiry' => $this->enquiry  // Pass data to the email view

@@ -26,7 +26,16 @@ class AuthController extends Controller
             ]
         );
 
-        \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($otp));
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($otp));
+        } catch (\Exception $e) {
+            \Log::error("Failed to send OTP to $user->email: " . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to send OTP. Please check your mail configuration or try again later.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
 
         return response()->json([
             'status' => 'success',
