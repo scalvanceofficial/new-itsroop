@@ -46,15 +46,13 @@ Route::prefix('export')->group(function () {
 });
 
 
-Route::prefix('admin')->group(function () {
-    Route::get('/', function () {
-        return redirect()->route('admin.dashboard.index');
-    });
+Route::get('/', function () {
+    return redirect()->route('admin.dashboard.index');
 });
 
 Route::middleware(['auth', 'admin', 'preventBackHistory'])->group(function () {
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    // ... (rest of routes)
         Route::post('dashboard/data', [DashboardController::class, 'getData'])->name('dashboard.data');
         Route::post('dashboard/wishlist-products', [DashboardController::class, 'getWishlistProduct'])->name('dashboard.wishlist-products');
         Route::post('dashboard/selling-products', [DashboardController::class, 'getSellingProduct'])->name('dashboard.selling-products');
@@ -227,4 +225,3 @@ Route::middleware(['auth', 'admin', 'preventBackHistory'])->group(function () {
         Route::post('currencies/data', [\App\Http\Controllers\Admin\CurrencyController::class, 'data'])->name('currencies.data');
         Route::post('currencies/change-status', [\App\Http\Controllers\Admin\CurrencyController::class, 'changeStatus'])->name('currencies.change.status');
     });
-});
