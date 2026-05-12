@@ -96,7 +96,7 @@ class RouteServiceProvider extends ServiceProvider
 
     private function getModel($class, $routeKey)
     {
-        $model = "App\\Models\\" . basename($class, '.php');
+        $model = $class;
         \Log::info('getModel attempting resolution', ['model' => $model, 'routeKey' => $routeKey]);
 
         if (!is_numeric($routeKey)) {
