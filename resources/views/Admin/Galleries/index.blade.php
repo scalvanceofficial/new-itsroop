@@ -1,7 +1,6 @@
 @extends('layouts.admin')
 @section('title') Galleries @endsection
 @section('content')
-
 @section('content')
     <section>
         <div class="row">
@@ -48,7 +47,36 @@
                     </div>
                 </div>
             </div>
+        </div>
     </section>
+
+    {{-- Delete Confirmation Modal --}}
+    <div id="deleteGalleryModal" class="modal fade" tabindex="-1" aria-labelledby="deleteGalleryModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="deleteGalleryModalLabel">Delete Gallery</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete this Gallery entry?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form action="#" method="POST" id="deleteGalleryForm">
+                        {{ method_field('DELETE') }}
+                        @csrf
+                        <input type="hidden" name="deleteGalleryId" id="deleteGalleryId">
+                        <button type="submit" class="btn btn-danger" id="gallerydeletesubmit-btn">
+                            <span class="delete-spinner-span"></span> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="text/javascript">
         $(function() {
             var dataTable = $('#datatable').DataTable({
@@ -124,6 +152,61 @@
             $(
                 ".buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel"
             ).addClass("btn btn-primary mr-1");
+        });
+
+        $(document).on('click', '.gallery-delete-btn', function(e) {
+            var id = $(this).data('id');
+            $('#deleteGalleryId').val(id);
+            $('#deleteGalleryModal').modal('show');
+        });
+
+        $('#deleteGalleryForm').submit(function(e) {
+            e.preventDefault();
+
+            $('#gallerydeletesubmit-btn').attr('disabled', true);
+            $('.delete-spinner-span').addClass('spinner-border spinner-border-sm');
+
+            var deleteGalleryId = $('#deleteGalleryId').val();
+
+            $.ajax({
+                url: '/admin/galleries/' + deleteGalleryId,
+                type: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.status === 'success') {
+                        toastr.success(response.message, '', {
+                            showMethod: "slideDown",
+                            hideMethod: "slideUp",
+                            timeOut: 1500,
+                            closeButton: true,
+                        });
+
+                        $('#deleteGalleryModal').modal('hide');
+                        $('#datatable').DataTable().ajax.reload(null, false);
+                    } else {
+                        toastr.error('There was an error deleting the Gallery.', '', {
+                            showMethod: "slideDown",
+                            hideMethod: "slideUp",
+                            timeOut: 1500,
+                            closeButton: true,
+                        });
+                    }
+
+                    $('#gallerydeletesubmit-btn').attr('disabled', false);
+                    $('.delete-spinner-span').removeClass('spinner-border spinner-border-sm');
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Something went wrong. Please try again.', '', {
+                        showMethod: "slideDown",
+                        hideMethod: "slideUp",
+                        timeOut: 1500,
+                        closeButton: true,
+                    });
+
+                    $('#gallerydeletesubmit-btn').attr('disabled', false);
+                    $('.delete-spinner-span').removeClass('spinner-border spinner-border-sm');
+                }
+            });
         });
     </script>
 @endsection

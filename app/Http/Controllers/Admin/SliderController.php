@@ -69,11 +69,12 @@ class SliderController extends Controller
             })
 
             ->addColumn('action', function ($slider) {
-
-                return '<a href="' . route('admin.sliders.edit', $slider->route_key) . '"
-                        class="badge bg-warning">
-                        <i class="fa fa-edit"></i>
-                        </a>';
+                $edit = '<a href="' . route('admin.sliders.edit', $slider->route_key) . '" class="badge bg-warning fs-1"><i class="fa fa-edit"></i></a>';
+                $delete = '<a href="#" class="btn btn-danger btn-sm fs-1 slider-delete-btn"
+                            data-id="' . $slider->id . '"
+                            data-routekey="' . $slider->route_key . '">
+                            <i class="fa fa-trash"></i></a>';
+                return $edit . ' ' . $delete;
             })
 
             ->filterColumn('subtitle', function ($query, $keyword) {
@@ -202,6 +203,23 @@ class SliderController extends Controller
         ]);
     }
 
+
+    public function destroy(Slider $slider)
+    {
+        \Log::info('SliderController@destroy called', ['slider_id' => $slider->id]);
+        if ($slider->image) {
+            Storage::disk('public')->delete($slider->image);
+        }
+        if ($slider->mobile_image) {
+            Storage::disk('public')->delete($slider->mobile_image);
+        }
+        $slider->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Slider deleted successfully.'
+        ]);
+    }
 
     private $rules = [
         'image' => 'required|image',

@@ -54,7 +54,10 @@ class ReviewController extends Controller
             })
             ->addColumn('action', function ($review) {
                 $edit = '<a href="' . route('admin.reviews.edit', ['review' => $review->id]) . '" class="badge bg-warning fs-1"><i class="fa fa-edit"></i></a>';
-                return $edit;
+                $delete = '<a href="#" class="btn btn-danger btn-sm fs-1 review-delete-btn"
+                            data-id="' . $review->id . '">
+                            <i class="fa fa-trash"></i></a>';
+                return $edit . ' ' . $delete;
             })
 
             ->filterColumn('product_name', function ($query, $keyword) {
@@ -159,6 +162,21 @@ class ReviewController extends Controller
             'status' => 'success',
             'message' => 'Review Updated Successfully',
             'review' => $review,
+        ], 200);
+    }
+
+    public function destroy(Review $review)
+    {
+        if ($review->photos) {
+            foreach ($review->photos as $photo) {
+                Storage::disk('public')->delete($photo);
+            }
+        }
+        $review->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Review deleted successfully.',
         ], 200);
     }
 

@@ -84,6 +84,32 @@
                     </div>
                 </div>
             </div>
+    <div id="deleteSubCategoryModal" class="modal fade" tabindex="-1" aria-labelledby="deleteSubCategoryModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="deleteSubCategoryModalLabel">Delete Sub Category
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete this Sub Category?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form action="#" method="POST" id="deleteSubCategoryForm">
+                        {{ method_field('DELETE') }}
+                        @csrf
+                        <input type="hidden" name="deleteSubCategoryId" id="deleteSubCategoryId">
+                        <button type="submit" class="btn btn-danger" id="subcatdeletesubmit-btn">
+                            <span class="delete-spinner-span"></span> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     </section>
     <script type="text/javascript">
         $(function() {
@@ -130,15 +156,16 @@
                 columnDefs: [{
                     targets: [0],
                     className: "text-center"
-                }, ],
+                }],
             });
-            $(
-                ".buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel"
-            ).addClass("btn btn-primary mr-1");
 
+            $(".buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel")
+                .addClass("btn btn-primary mr-1");
+
+            // Status / show_in_navbar switch
             $(document).on('change', '.sub_category-status-switch, .sub_category-show_in_navbar-switch', function(e) {
                 e.preventDefault();
-                var id = $(this).data('id');
+                var id     = $(this).data('id');
                 var column = $(this).data('column') || 'status';
                 var status = $(this).is(':checked') ? 'ACTIVE' : 'INACTIVE';
                 $.ajax({
@@ -170,14 +197,65 @@
                             });
                         }
                     },
-
-                    error: function(data) {
+                    error: function() {
                         toastr.error('Something went wrong!');
                     }
                 });
             });
 
+            // Delete button — open modal
+            $(document).on('click', '.subcategory-delete-btn', function(e) {
+                var id = $(this).data('id');
+                $('#deleteSubCategoryId').val(id);
+                $('#deleteSubCategoryModal').modal('show');
+            });
 
+            // Delete form submit
+            $('#deleteSubCategoryForm').submit(function(e) {
+                e.preventDefault();
+
+                $('#subcatdeletesubmit-btn').attr('disabled', true);
+                $('.delete-spinner-span').addClass('spinner-border spinner-border-sm');
+
+                var deleteSubCategoryId = $('#deleteSubCategoryId').val();
+
+                $.ajax({
+                    url: '/admin/categories/{{ $category->route_key }}/sub_categories/' + deleteSubCategoryId,
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            toastr.success(response.message, '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
+                            $('#deleteSubCategoryModal').modal('hide');
+                            $('#datatable').DataTable().ajax.reload(null, false);
+                        } else {
+                            toastr.error('There was an error deleting the Sub Category.', '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
+                        }
+                        $('#subcatdeletesubmit-btn').attr('disabled', false);
+                        $('.delete-spinner-span').removeClass('spinner-border spinner-border-sm');
+                    },
+                    error: function() {
+                        toastr.error('Something went wrong. Please try again.', '', {
+                            showMethod: "slideDown",
+                            hideMethod: "slideUp",
+                            timeOut: 1500,
+                            closeButton: true,
+                        });
+                        $('#subcatdeletesubmit-btn').attr('disabled', false);
+                        $('.delete-spinner-span').removeClass('spinner-border spinner-border-sm');
+                    }
+                });
+            });
         });
     </script>
 @endsection

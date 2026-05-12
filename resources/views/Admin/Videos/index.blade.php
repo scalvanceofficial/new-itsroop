@@ -96,6 +96,31 @@
                 </div>
             </div>
         </div>
+    <div id="deleteVideoModal" class="modal fade" tabindex="-1" aria-labelledby="deleteVideoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="deleteVideoModalLabel">Delete Video
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete this Video?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form action="#" method="POST" id="deleteVideoForm">
+                        {{ method_field('DELETE') }}
+                        @csrf
+                        <input type="hidden" name="deleteVideoId" id="deleteVideoId">
+                        <button type="submit" class="btn btn-danger" id="deletesubmit-btn">
+                            <span class="delete-spinner-span"></span> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="text/javascript">
@@ -192,53 +217,113 @@
                     }
                 });
             });
-        });
 
-        $(document).on('click', '.videoIndexBtn', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-            var index = $(this).data('index');
+            $(document).on('click', '.videoIndexBtn', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                var index = $(this).data('index');
 
-            $('#updateIndexModal').modal('show');
-            $('#videoId').val(id);
-            $("#indexDropdown").val(index).val(index);
-        });
+                $('#updateIndexModal').modal('show');
+                $('#videoId').val(id);
+                $("#indexDropdown").val(index).val(index);
+            });
 
-        $(document).on('change', '.video-status-switch', function(e) {
-            e.preventDefault();
-            var routeKey = $(this).data('routekey');
-            var status = $(this).is(':checked') ? 'ACTIVE' : 'INACTIVE';
-            $.ajax({
-                url: "{{ route('admin.videos.change.status') }}",
-                type: 'POST',
-                data: {
-                    _token: $('meta[name=csrf-token]').attr('content'),
-                    route_key: routeKey,
-                    status: status
-                },
-                success: function(data) {
-                    if (data.status == 'success') {
-                        toastr.success(data.message, '', {
-                            showMethod: "slideDown",
-                            hideMethod: "slideUp",
-                            timeOut: 1500,
-                            closeButton: true,
-                        });
-                        if ($.fn.DataTable.isDataTable("#datatable")) {
-                            $('#datatable').DataTable().draw(false);
+            $(document).on('change', '.video-status-switch', function(e) {
+                e.preventDefault();
+                var routeKey = $(this).data('routekey');
+                var status = $(this).is(':checked') ? 'ACTIVE' : 'INACTIVE';
+                $.ajax({
+                    url: "{{ route('admin.videos.change.status') }}",
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name=csrf-token]').attr('content'),
+                        route_key: routeKey,
+                        status: status
+                    },
+                    success: function(data) {
+                        if (data.status == 'success') {
+                            toastr.success(data.message, '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
+                            if ($.fn.DataTable.isDataTable("#datatable")) {
+                                $('#datatable').DataTable().draw(false);
+                            }
+                        } else {
+                            toastr.error(data.message, '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
                         }
-                    } else {
-                        toastr.error(data.message, '', {
+                    },
+                    error: function(data) {
+                        toastr.error('Something went wrong!');
+                    }
+                });
+            });
+
+            $(document).on('click', '.video-delete-btn', function(e) {
+                var id = $(this).data('id');
+
+                $('#deleteVideoId').val(id);
+                $('#deleteVideoModal').modal('show');
+            });
+
+            $('#deleteVideoForm').submit(function(e) {
+                e.preventDefault();
+
+                $('#deletesubmit-btn').attr('disabled', true);
+                $('.delete-spinner-span').addClass('spinner-border spinner-border-sm');
+
+                var deleteVideoId = $('#deleteVideoId').val();
+
+                $.ajax({
+                    url: '/admin/videos/' + deleteVideoId,
+                    type: "DELETE",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            toastr.success(response.message, '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
+
+                            $('#deleteVideoModal').modal('hide');
+                            $('#datatable').DataTable().ajax.reload(null, false);
+                        } else {
+                            toastr.error('There was an error deleting the Video.', '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
+                        }
+
+                        $('#deletesubmit-btn').attr('disabled', false);
+                        $('.delete-spinner-span').removeClass(
+                            'spinner-border spinner-border-sm');
+                    },
+                    error: function(xhr, status, error) {
+                        toastr.error('Something went wrong. Please try again.', '', {
                             showMethod: "slideDown",
                             hideMethod: "slideUp",
                             timeOut: 1500,
                             closeButton: true,
                         });
+
+                        $('#deletesubmit-btn').attr('disabled', false);
+                        $('.delete-spinner-span').removeClass(
+                            'spinner-border spinner-border-sm');
                     }
-                },
-                error: function(data) {
-                    toastr.error('Something went wrong!');
-                }
+                });
             });
         });
     </script>

@@ -82,6 +82,7 @@
                     </div>
                 </div>
             </div>
+        </div>
     </section>
 
     <div class="modal fade" id="updateIndexModal" tabindex="-1" role="dialog" aria-labelledby="updateIndexModalLabel"
@@ -116,31 +117,6 @@
         </div>
     </div>
 
-    <div id="deleteProductModal" class="modal fade" tabindex="-1" aria-labelledby="deleteProductModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title" id="deleteProductModalLabel">Delete Product
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <h5>Are you sure you want to delete this Product?</h5>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <form action="#" method="POST" id="deleteProductForm">
-                        {{ method_field('DELETE') }}
-                        @csrf
-                        <input type="hidden" name="deleteProductId" id="deleteProductId">
-                        <button type="submit" class="btn btn-danger" id="deletesubmit-btn">
-                            <span class="delete-spinner-span"></span> Delete
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script type="text/javascript">
@@ -207,16 +183,14 @@
             $(".buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel")
                 .addClass("btn btn-primary mr-1");
         });
-        $('#categoryId').on('change', function() {
-            $('#datatable').DataTable().ajax.reload();
-        });
-        $('#subCategoryId').on('change', function() {
-            $('#datatable').DataTable().ajax.reload();
-        });
-
-
-
         $(document).ready(function(e) {
+            $('#categoryId').on('change', function() {
+                $('#datatable').DataTable().ajax.reload();
+            });
+            $('#subCategoryId').on('change', function() {
+                $('#datatable').DataTable().ajax.reload();
+            });
+
             $('#updateIndexForm').on('submit', function(e) {
                 e.preventDefault();
 
@@ -249,113 +223,103 @@
                     }
                 });
             });
-        })
 
-        $(document).on('click', '.productIndexBtn', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-            var index = $(this).data('index');
+            $(document).on('click', '.productIndexBtn', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                var index = $(this).data('index');
 
-            $('#updateIndexModal').modal('show');
-            $('#productId').val(id);
-            $("#indexDropdown").val(index).val(index);
-        });
-
-        $(document).on('change', '.product-status-switch, .product-featured-switch', function(e) {
-            e.preventDefault();
-            var routeKey = $(this).data('routekey');
-            var column = $(this).data('column');
-            var status = $(this).is(':checked') ? 'ACTIVE' : 'INACTIVE';
-
-            $.ajax({
-                url: '{!! route('admin.products.change.status') !!}',
-                type: 'POST',
-                data: {
-                    _token: $('meta[name=csrf-token]').attr('content'),
-                    route_key: routeKey,
-                    status: status,
-                    column: column
-                },
-                success: function(data) {
-                    if (data.status == 'success') {
-                        toastr.success(data.message, '', {
-                            showMethod: "slideDown",
-                            hideMethod: "slideUp",
-                            timeOut: 1500,
-                            closeButton: true,
-                        });
-                        if ($.fn.DataTable.isDataTable("#datatable")) {
-                            $('#datatable').DataTable().draw(false);
-                        }
-                    } else {
-                        toastr.error(data.message, '', {
-                            showMethod: "slideDown",
-                            hideMethod: "slideUp",
-                            timeOut: 1500,
-                            closeButton: true,
-                        });
-                    }
-                },
-                error: function(data) {
-                    toastr.error('Something went wrong!');
-                }
+                $('#updateIndexModal').modal('show');
+                $('#productId').val(id);
+                $("#indexDropdown").val(index).val(index);
             });
-        });
 
+            $(document).on('change', '.product-status-switch, .product-featured-switch', function(e) {
+                e.preventDefault();
+                var routeKey = $(this).data('routekey');
+                var column = $(this).data('column');
+                var status = $(this).is(':checked') ? 'ACTIVE' : 'INACTIVE';
 
-        $(document).on('click', '.product-delete-btn', function(e) {
-            var id = $(this).data('id');
-
-            $('#deleteProductId').val(id);
-            $('#deleteProductModal').modal('show');
-        });
-
-        $('#deleteProductForm').submit(function(e) {
-            e.preventDefault();
-
-            $('#deletesubmit-btn').attr('disabled', true);
-            $('.delete-spinner-span').addClass('spinner-border spinner-border-sm');
-
-            var deleteProductId = $('#deleteProductId').val();
-
-            $.ajax({
-                url: '/admin/products/' + deleteProductId,
-                type: "POST",
-                data: $(this).serialize(),
-                success: function(response) {
-                    if (response.status === 'success') {
-                        toastr.success(response.message, '', {
-                            showMethod: "slideDown",
-                            hideMethod: "slideUp",
-                            timeOut: 1500,
-                            closeButton: true,
-                        });
-
-                        $('#deleteProductModal').modal('hide');
-                        $('#datatable').DataTable().ajax.reload(null, false);
-                    } else {
-                        toastr.error('There was an error deleting the Product.', '', {
-                            showMethod: "slideDown",
-                            hideMethod: "slideUp",
-                            timeOut: 1500,
-                            closeButton: true,
-                        });
+                $.ajax({
+                    url: '{!! route('admin.products.change.status') !!}',
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name=csrf-token]').attr('content'),
+                        route_key: routeKey,
+                        status: status,
+                        column: column
+                    },
+                    success: function(data) {
+                        if (data.status == 'success') {
+                            toastr.success(data.message, '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
+                            if ($.fn.DataTable.isDataTable("#datatable")) {
+                                $('#datatable').DataTable().draw(false);
+                            }
+                        } else {
+                            toastr.error(data.message, '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
+                        }
+                    },
+                    error: function(data) {
+                        toastr.error('Something went wrong!');
                     }
+                });
+            });
 
-                    $('#deletesubmit-btn').attr('disabled', false);
-                    $('.delete-spinner-span').removeClass('spinner-border spinner-border-sm');
-                },
-                error: function(xhr, status, error) {
-                    toastr.error('Something went wrong. Please try again.', '', {
-                        showMethod: "slideDown",
-                        hideMethod: "slideUp",
-                        timeOut: 1500,
-                        closeButton: true,
-                    });
 
-                    $('#deletesubmit-btn').attr('disabled', false);
-                    $('.delete-spinner-span').removeClass('spinner-border spinner-border-sm');
-                }
+            $(document).on('click', '.product-delete-btn', function(e) {
+                e.preventDefault();
+                var deleteProductId = $(this).attr('data-routekey');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return $.ajax({
+                            url: '{{ route('admin.products.destroy', ['product' => 'PLACEHOLDER']) }}'.replace('PLACEHOLDER', deleteProductId),
+                            type: "POST",
+                            data: {
+                                _method: 'DELETE',
+                                _token: $('meta[name="csrf-token"]').attr('content')
+                            }
+                        }).then(response => {
+                            console.log('Delete response:', response);
+                            if (response.status !== 'success') {
+                                throw new Error(response.message || 'There was an error deleting the Product.');
+                            }
+                            return response;
+                        }).catch(error => {
+                            console.error('Delete error:', error);
+                            Swal.showValidationMessage(`Request failed: ${error}`);
+                        });
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        toastr.success(result.value.message, '', {
+                            showMethod: "slideDown",
+                            hideMethod: "slideUp",
+                            timeOut: 1500,
+                            closeButton: true,
+                        });
+                        $('#datatable').DataTable().ajax.reload(null, false);
+                    }
+                });
             });
         });
     </script>

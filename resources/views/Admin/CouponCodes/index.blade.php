@@ -61,6 +61,32 @@
             </div>
         </div>
     </section>
+    <div id="deleteCouponModal" class="modal fade" tabindex="-1" aria-labelledby="deleteCouponModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="deleteCouponModalLabel">Delete Coupon Code
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete this Coupon Code?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form action="#" method="POST" id="deleteCouponForm">
+                        {{ method_field('DELETE') }}
+                        @csrf
+                        <input type="hidden" name="deleteCouponId" id="deleteCouponId">
+                        <button type="submit" class="btn btn-danger" id="coupondeletesubmit-btn">
+                            <span class="delete-spinner-span"></span> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="text/javascript">
         $(function() {
@@ -159,6 +185,62 @@
                 },
                 error: function(data) {
                     toastr.error('Something went wrong!');
+                }
+            });
+        });
+
+        $(document).on('click', '.couponcode-delete-btn', function(e) {
+            var id = $(this).data('id');
+
+            $('#deleteCouponId').val(id);
+            $('#deleteCouponModal').modal('show');
+        });
+
+        $('#deleteCouponForm').submit(function(e) {
+            e.preventDefault();
+
+            $('#coupondeletesubmit-btn').attr('disabled', true);
+            $('.delete-spinner-span').addClass('spinner-border spinner-border-sm');
+
+            var deleteCouponId = $('#deleteCouponId').val();
+
+            $.ajax({
+                url: '/admin/coupon-codes/' + deleteCouponId,
+                type: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.status === 'success') {
+                        toastr.success(response.message, '', {
+                            showMethod: "slideDown",
+                            hideMethod: "slideUp",
+                            timeOut: 1500,
+                            closeButton: true,
+                        });
+
+                        $('#deleteCouponModal').modal('hide');
+                        $('#datatable').DataTable().ajax.reload(null, false);
+                    } else {
+                        toastr.error('There was an error deleting the Coupon Code.', '', {
+                            showMethod: "slideDown",
+                            hideMethod: "slideUp",
+                            timeOut: 1500,
+                            closeButton: true,
+                        });
+                    }
+
+                    $('#coupondeletesubmit-btn').attr('disabled', false);
+                    $('.delete-spinner-span').removeClass('spinner-border spinner-border-sm');
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Something went wrong. Please try again.', '', {
+                        showMethod: "slideDown",
+                        hideMethod: "slideUp",
+                        timeOut: 1500,
+                        closeButton: true,
+                    });
+
+                    $('#coupondeletesubmit-btn').attr('disabled', false);
+                    $('.delete-spinner-span').removeClass('spinner-border spinner-border-sm');
                 }
             });
         });

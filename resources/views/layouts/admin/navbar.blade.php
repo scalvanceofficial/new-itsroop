@@ -44,7 +44,7 @@
 
         <li class="sidebar-item">
             <a class="sidebar-link has-arrow 
-                @if (Route::is('admin.sliders.*') || Route::is('admin.videos.*')) active @endif"
+                @if (Route::is('admin.sliders.*') || Route::is('admin.videos.*') || Route::is('admin.galleries.*')) active @endif"
                 href="#" aria-expanded="false">
                 <span>
                     <i class="fas fa-images"></i>
@@ -53,7 +53,7 @@
             </a>
             <ul aria-expanded="false"
                 class="collapse first-level 
-                @if (Route::is('admin.sliders.*') || Route::is('admin.videos.*')) in @endif">
+                @if (Route::is('admin.sliders.*') || Route::is('admin.videos.*') || Route::is('admin.galleries.*')) in @endif">
 
                 @can('sliders-view')
                     <li class="sidebar-item">
@@ -78,6 +78,18 @@
                         </a>
                     </li>
                 @endcan
+
+                <!-- @can('galleries-view')
+                    <li class="sidebar-item">
+                        <a class="sidebar-link @if (Route::is('admin.galleries.*')) active @endif"
+                            href="{{ route('admin.galleries.index') }}" aria-expanded="false">
+                            <span>
+                                <i class="ti ti-circle"></i>
+                            </span>
+                            <span class="hide-menu">Galleries</span>
+                        </a>
+                    </li>
+                @endcan -->
             </ul>
         </li>
 
@@ -136,7 +148,7 @@
                     </li>
                 @endcan
 
-                @can('collections-view')
+                <!-- @can('collections-view')
                     <li class="sidebar-item">
                         <a class="sidebar-link @if (Route::is('admin.collections.*')) active @endif"
                             href="{{ route('admin.collections.index') }}" aria-expanded="false">
@@ -146,7 +158,7 @@
                             <span class="hide-menu">Collections</span>
                         </a>
                     </li>
-                @endcan
+                @endcan -->
             </ul>
         </li>
 
@@ -246,7 +258,7 @@
         @endcan
 
 
-        @can('blog-view')
+        <!-- @can('blog-view')
             <li class="sidebar-item">
                 <a class="sidebar-link @if (Route::is('admin.blogs.*')) active @endif"
                     href="{{ route('admin.blogs.index') }}" aria-expanded="false">
@@ -256,9 +268,9 @@
                     <span class="hide-menu">Blogs</span>
                 </a>
             </li>
-        @endcan
+        @endcan -->
 
-        @can('news-view')
+        <!-- @can('news-view')
             <li class="sidebar-item">
                 <a class="sidebar-link @if (Route::is('admin.news.*')) active @endif"
                     href="{{ route('admin.news.index') }}" aria-expanded="false">
@@ -268,7 +280,7 @@
                     <span class="hide-menu">News</span>
                 </a>
             </li>
-        @endcan
+        @endcan -->
 
         <!-- @can('credential-view')
             <li class="sidebar-item">

@@ -64,7 +64,11 @@ class VideoController extends Controller
             })
             ->addColumn('action', function ($video) {
                 $edit  = '<a href="' . route('admin.videos.edit', ['video' => $video->route_key]) . '" class="badge bg-warning fs-1"><i class="fa fa-edit"></i></a>';
-                return $edit;
+                $delete = '<a href="#" class="btn btn-danger btn-sm fs-1 video-delete-btn"
+                            data-id="' . $video->id . '"
+                            data-routekey="' . $video->route_key . '">
+                            <i class="fa fa-trash"></i></a>';
+                return $edit . ' ' . $delete;
             })
             ->addIndexColumn()
             ->rawColumns(['action', 'index', 'url', 'video', 'status'])
@@ -172,9 +176,17 @@ class VideoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Video $video)
     {
-        //
+        if ($video->video) {
+            Storage::disk('public')->delete($video->video);
+        }
+        $video->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Video deleted successfully.'
+        ], 200);
     }
 
     public function changeStatus(Request $request)

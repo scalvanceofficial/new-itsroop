@@ -51,6 +51,7 @@
                     </div>
                 </div>
             </div>
+        </div>
     </section>
 
     <div class="modal fade" id="updateIndexModal" tabindex="-1" role="dialog" aria-labelledby="updateIndexModalLabel"
@@ -83,6 +84,8 @@
                 </div>
             </div>
         </div>
+    </div>
+
     </div>
 
     <script type="text/javascript">
@@ -181,109 +184,99 @@
                     }
                 });
             });
-        });
 
-        $(document).on('click', '.propertyIndexBtn', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-            var index = $(this).data('index');
+            $(document).on('click', '.propertyIndexBtn', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                var index = $(this).data('index');
 
-            $('#updateIndexModal').modal('show');
-            $('#propertyId').val(id);
-            $("#indexDropdown").val(index).val(index);
-        });
-
-        $(document).on('change', '.properties-status-switch', function(e) {
-            e.preventDefault();
-            var routeKey = $(this).data('routekey');
-            var status = $(this).is(':checked') ? 'ACTIVE' : 'INACTIVE';
-            $.ajax({
-                url: "{{ route('admin.properties.change.status') }}",
-                type: 'POST',
-                data: {
-                    _token: $('meta[name=csrf-token]').attr('content'),
-                    route_key: routeKey,
-                    status: status
-                },
-                success: function(data) {
-                    if (data.status == 'success') {
-                        toastr.success(data.message, '', {
-                            showMethod: "slideDown",
-                            hideMethod: "slideUp",
-                            timeOut: 1500,
-                            closeButton: true,
-                        });
-                        if ($.fn.DataTable.isDataTable("#datatable")) {
-                            $('#datatable').DataTable().draw(false);
-                        }
-                    } else {
-                        toastr.error(data.message, '', {
-                            showMethod: "slideDown",
-                            hideMethod: "slideUp",
-                            timeOut: 1500,
-                            closeButton: true,
-                        });
-                    }
-                },
-                error: function(data) {
-                    toastr.error('Something went wrong!');
-                }
+                $('#updateIndexModal').modal('show');
+                $('#propertyId').val(id);
+                $("#indexDropdown").val(index).val(index);
             });
-        });
 
-        // Update Indexing  Number
-        $(document).on('submit', '#changeIndexForm', function(e) {
-            e.preventDefault();
-            $('div[id$="-error"]').empty();
-            var form = $(this);
-            var url = form.attr('action');
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: new FormData(this),
-                contentType: false,
-                cache: false,
-                processData: false,
-                success: function(data) {
-                    if (data.status == 'success') {
-                        toastr.success(data.message, '', {
-                            showMethod: "slideDown",
-                            hideMethod: "slideUp",
-                            timeOut: 1500,
-                            closeButton: true,
-                        });
-                        setTimeout(function() {
+            $(document).on('change', '.properties-status-switch', function(e) {
+                e.preventDefault();
+                var routeKey = $(this).data('routekey');
+                var status = $(this).is(':checked') ? 'ACTIVE' : 'INACTIVE';
+                $.ajax({
+                    url: "{{ route('admin.properties.change.status') }}",
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name=csrf-token]').attr('content'),
+                        route_key: routeKey,
+                        status: status
+                    },
+                    success: function(data) {
+                        if (data.status == 'success') {
+                            toastr.success(data.message, '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
                             if ($.fn.DataTable.isDataTable("#datatable")) {
-                                $('#datatable').DataTable().draw();
+                                $('#datatable').DataTable().draw(false);
                             }
-                            $('#modalOneTitle').html('');
-                            $('#modalOneBody').html('');
-                            $('#modalOne').modal('hide');
-                        }, 100);
-                    } else {
-                        toastr.error('There is some error!!', '', {
+                        } else {
+                            toastr.error(data.message, '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
+                        }
+                    },
+                    error: function(data) {
+                        toastr.error('Something went wrong!');
+                    }
+                });
+            });
+
+            $(document).on('click', '.property-delete-btn', function(e) {
+                e.preventDefault();
+                var deletePropertyId = $(this).attr('data-routekey');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return $.ajax({
+                            url: '{{ route('admin.properties.destroy', ['property' => 'PLACEHOLDER']) }}'.replace('PLACEHOLDER', deletePropertyId),
+                            type: "POST",
+                            data: {
+                                _method: 'DELETE',
+                                _token: $('meta[name="csrf-token"]').attr('content')
+                            }
+                        }).then(response => {
+                            console.log('Delete response:', response);
+                            if (response.status !== 'success') {
+                                throw new Error(response.message || 'There was an error deleting the Property.');
+                            }
+                            return response;
+                        }).catch(error => {
+                            console.error('Delete error:', error);
+                            Swal.showValidationMessage(`Request failed: ${error}`);
+                        });
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        toastr.success(result.value.message, '', {
                             showMethod: "slideDown",
                             hideMethod: "slideUp",
                             timeOut: 1500,
                             closeButton: true,
                         });
+                        $('#datatable').DataTable().ajax.reload(null, false);
                     }
-                },
-                error: function(xhr, ajaxOptions, thrownError) {
-                    toastr.error('There are some errors in Form. Please check your inputs', '', {
-                        showMethod: "slideDown",
-                        hideMethod: "slideUp",
-                        timeOut: 1500,
-                        closeButton: true,
-                    });
-                    $.each(xhr.responseJSON.errors, function(key, value) {
-                        $('#' + key + '-error').html(value);
-                    });
-                    $('html, body').animate({
-                        scrollTop: $('#' + Object.keys(xhr.responseJSON.errors)[0] + '-error')
-                            .offset().top - 200
-                    }, 500);
-                }
+                });
             });
         });
     </script>

@@ -54,7 +54,10 @@ class SubCategoryController extends Controller
 
             ->addColumn('action', function ($sub_category) use ($category) {
                 $edit = '<a href="' . route('admin.categories.sub_categories.edit', ['category' => $category->route_key, 'sub_category' => $sub_category->route_key]) . '" class="badge bg-warning fs-1"><i class="fa fa-edit"></i></a>';
-                return $edit;
+                $delete = '<a href="#" class="btn btn-danger btn-sm fs-1 subcategory-delete-btn"
+                            data-id="' . $sub_category->id . '">
+                            <i class="fa fa-trash"></i></a>';
+                return $edit . ' ' . $delete;
             })
             ->addIndexColumn()
             ->rawColumns(['name', 'show_in_navbar', 'status', 'action'])
@@ -160,9 +163,14 @@ class SubCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Category $category, SubCategory $sub_category)
     {
-        //
+        $sub_category->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sub Category deleted successfully.',
+        ], 200);
     }
 
     private $rules = [

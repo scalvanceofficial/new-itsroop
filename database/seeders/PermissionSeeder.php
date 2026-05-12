@@ -61,6 +61,7 @@ class PermissionSeeder extends Seeder
                     'edit',
                     'update',
                     'changeStatus',
+                    'destroy',
                 ],
             ]
         ],
@@ -82,6 +83,7 @@ class PermissionSeeder extends Seeder
                     'update',
                     'changeStatus',
                     'updateIndex',
+                    'destroy',
                 ],
             ]
         ],
@@ -121,6 +123,7 @@ class PermissionSeeder extends Seeder
                     'edit',
                     'update',
                     'changeStatus',
+                    'destroy',
                 ],
             ]
         ],
@@ -170,6 +173,7 @@ class PermissionSeeder extends Seeder
                     'update',
                     'changeStatus',
                     'updateIndex',
+                    'destroy',
                 ],
             ]
         ],
@@ -188,7 +192,8 @@ class PermissionSeeder extends Seeder
                     'edit',
                     'update',
                     'changeStatus',
-                    'updateIndex'
+                    'updateIndex',
+                    'destroy',
                 ],
             ]
         ],
@@ -207,7 +212,8 @@ class PermissionSeeder extends Seeder
                     'edit',
                     'update',
                     'changeStatus',
-                    'updateIndex'
+                    'updateIndex',
+                    'destroy',
                 ],
             ]
         ],
@@ -341,6 +347,7 @@ class PermissionSeeder extends Seeder
                     'edit',
                     'update',
                     'changeStatus',
+                    'destroy',
                 ],
             ]
         ],
@@ -362,8 +369,8 @@ class PermissionSeeder extends Seeder
                     'edit',
                     'update',
                     'changeStatus',
-                    'updateIndex'
-
+                    'updateIndex',
+                    'destroy',
                 ],
             ]
         ],
@@ -385,7 +392,8 @@ class PermissionSeeder extends Seeder
                     'edit',
                     'update',
                     'changeStatus',
-                    'updateIndex'
+                    'updateIndex',
+                    'destroy',
                 ],
             ]
         ],
@@ -407,7 +415,8 @@ class PermissionSeeder extends Seeder
                     'edit',
                     'update',
                     'changeStatus',
-                    'updateIndex'
+                    'updateIndex',
+                    'destroy',
                 ],
             ]
         ],
@@ -440,6 +449,26 @@ class PermissionSeeder extends Seeder
                     'edit',
                     'update',
                     'changeStatus',
+                    'destroy',
+                ],
+            ]
+        ],
+
+        'Gallery' => [
+            'controller' => 'Admin\GalleryController',
+            'permissions' => [
+                'galleries-view' => [
+                    'index',
+                    'data',
+                ],
+                'galleries-store' => [
+                    'create',
+                    'store',
+                ],
+                'galleries-update' => [
+                    'edit',
+                    'update',
+                    'destroy',
                 ],
             ]
         ],
@@ -559,6 +588,11 @@ class PermissionSeeder extends Seeder
             'coupon-code-view',
             'coupon-code-store',
             'coupon-code-update',
+
+            #galleries
+            'galleries-view',
+            'galleries-store',
+            'galleries-update',
 
             //End of Role Permission
         ],

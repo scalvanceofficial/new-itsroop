@@ -75,24 +75,7 @@ class CategoryController extends Controller
 
                 $edit  = '<a href="' . route('admin.categories.edit', ['category' => $category->route_key]) . '" class="badge bg-warning fs-1"><i class="fa fa-edit"></i></a>';
 
-                $categoryIdJson = (string) $category->id;
-
-                $exists = Product::whereJsonContains('category_ids', $categoryIdJson)->exists();
-
-                $delete = '';
-
-                if (!$exists) {
-                    $delete = '<a href="#" class="btn btn-danger btn-sm fs-1 category-delete-btn"
-                            data-entity="categories" 
-                            data-title="Category"
-                            data-id="' . $category->id . '">
-                            <i class="fa fa-trash"></i></a>';
-                } else {
-                    $delete = '<span class="btn btn-secondary btn-sm fs-1" style="text-decoration: line-through;">
-                            <i class="fa fa-trash-alt"></i>
-                         </span>';
-                }
-                return $edit . ' ' . $delete;
+                return $edit;
             })
 
             ->addColumn('sub_categories', function ($category) {
@@ -214,13 +197,16 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        \Log::info('CategoryController@destroy called', ['category_id' => $category->id]);
+        if ($category->image) {
+            Storage::disk('public')->delete($category->image);
+        }
         $category->delete();
 
         return response()->json([
             'status' => 'success',
             'message' => 'Category deleted successfully.',
-            'category' => $category
-        ]);
+        ], 200);
     }
 
     /**

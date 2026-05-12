@@ -388,6 +388,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 </style>
+
 @section('content')
 {{-- Loading Overlay --}}
 <div id="filter-loading"><div class="spinner"></div></div>
@@ -464,9 +465,12 @@
                             <div class="swatch-group">
                                 @foreach ($property_values as $pv)
                                     <div class="swatch-wrap" title="{{ $pv->name }}">
+                                        {{-- FIX: added data-label="{{ $pv->name }}" so chips show the correct color name --}}
                                         <input type="radio" name="{{ $property->label }}"
                                                class="pill-input property-value color-radio"
-                                               id="color_{{ $pv->id }}" value="{{ $pv->id }}">
+                                               id="color_{{ $pv->id }}"
+                                               value="{{ $pv->id }}"
+                                               data-label="{{ $pv->name }}">
                                         <label for="color_{{ $pv->id }}"
                                                class="swatch-dot"
                                                style="background:{{ $pv->color }}"
@@ -485,9 +489,12 @@
                         <div class="fg-body" style="max-height:200px">
                             <div class="pill-group">
                                 @foreach ($property_values as $pv)
+                                    {{-- FIX: added data-label="{{ $pv->name }}" so chips show the correct property name --}}
                                     <input type="radio" name="{{ $property->label }}"
                                            class="pill-input property-value"
-                                           id="prop_{{ $pv->id }}" value="{{ $pv->id }}">
+                                           id="prop_{{ $pv->id }}"
+                                           value="{{ $pv->id }}"
+                                           data-label="{{ $pv->name }}">
                                     <label for="prop_{{ $pv->id }}" class="pill-label">{{ $pv->name }}</label>
                                 @endforeach
                             </div>
@@ -504,6 +511,7 @@
                     <div class="pill-group">
                         @foreach(['Men','Women','Unisex'] as $g)
                             <input type="radio" name="gender" class="pill-input gender-filter" id="g_{{ $g }}" value="{{ $g }}"
+                                data-label="{{ $g }}"
                                 {{ ($selected_gender ?? '') === $g ? 'checked' : '' }}>
                             <label for="g_{{ $g }}" class="pill-label">{{ $g }}</label>
                         @endforeach
@@ -516,9 +524,9 @@
                 <div class="fg-head"><span>Sort by Price</span><span class="arrow"></span></div>
                 <div class="fg-body" style="max-height:200px">
                     <div class="pill-group">
-                        <input type="radio" name="price_sort" class="pill-input price-sort" id="p_lth" value="low_to_high">
+                        <input type="radio" name="price_sort" class="pill-input price-sort" id="p_lth" value="low_to_high" data-label="Price: Low → High">
                         <label for="p_lth" class="pill-label">Low → High</label>
-                        <input type="radio" name="price_sort" class="pill-input price-sort" id="p_htl" value="high_to_low">
+                        <input type="radio" name="price_sort" class="pill-input price-sort" id="p_htl" value="high_to_low" data-label="Price: High → Low">
                         <label for="p_htl" class="pill-label">High → Low</label>
                     </div>
                 </div>
@@ -529,9 +537,9 @@
                 <div class="fg-head"><span>Sort by Rating</span><span class="arrow"></span></div>
                 <div class="fg-body" style="max-height:200px">
                     <div class="pill-group">
-                        <input type="radio" name="rating_sort" class="pill-input rating-sort" id="r_lth" value="low_to_high">
+                        <input type="radio" name="rating_sort" class="pill-input rating-sort" id="r_lth" value="low_to_high" data-label="Rating: Low → High">
                         <label for="r_lth" class="pill-label">Low → High</label>
-                        <input type="radio" name="rating_sort" class="pill-input rating-sort" id="r_htl" value="high_to_low">
+                        <input type="radio" name="rating_sort" class="pill-input rating-sort" id="r_htl" value="high_to_low" data-label="Rating: High → Low">
                         <label for="r_htl" class="pill-label">High → Low</label>
                     </div>
                 </div>
@@ -542,9 +550,9 @@
                 <div class="fg-head"><span>Stock</span><span class="arrow"></span></div>
                 <div class="fg-body" style="max-height:200px">
                     <div class="pill-group">
-                        <input type="radio" name="stock_sort" class="pill-input stock-sort" id="s_avail" value="available">
+                        <input type="radio" name="stock_sort" class="pill-input stock-sort" id="s_avail" value="available" data-label="In Stock">
                         <label for="s_avail" class="pill-label">In Stock</label>
-                        <input type="radio" name="stock_sort" class="pill-input stock-sort" id="s_out" value="out_of_stock">
+                        <input type="radio" name="stock_sort" class="pill-input stock-sort" id="s_out" value="out_of_stock" data-label="Out of Stock">
                         <label for="s_out" class="pill-label">Out of Stock</label>
                     </div>
                 </div>
@@ -645,6 +653,11 @@
 <script>
 $(document).ready(function () {
 
+    // ── FIX: Clear any stale/ghost checked states on page load ──
+    // This prevents "Orange", "S" or any leftover radio selections
+    // from showing as chips when no filter was actually applied.
+    $('input[type="radio"]').prop('checked', false);
+
     // ── Collapsible filter groups ──────────────────────────────
     $('.fg-head').on('click', function () {
         $(this).closest('.fg').toggleClass('collapsed');
@@ -708,21 +721,30 @@ $(document).ready(function () {
     }
 
     // ── Applied filter chips ──────────────────────────────────
+    // FIX: Use data-label attribute first, which is always set correctly
+    // on every radio input. This prevents wrong names (like "Orange", "S")
+    // from showing up due to missing label text on color swatch radios.
     function updateChips() {
-        let chips = '';
+        let chips  = '';
         let hasAny = false;
 
         $('input[type="radio"]:checked').each(function () {
             const val  = $(this).val();
             const name = $(this).attr('name');
-            const labelText = $('label[for="' + $(this).attr('id') + '"]').text().trim() || val;
-            if (val) {
-                hasAny = true;
-                chips += `<span class="chip" data-name="${name}">
-                    ${labelText}
-                    <button class="chip-remove" data-name="${name}" title="Remove">×</button>
-                </span>`;
-            }
+            const id   = $(this).attr('id');
+
+            if (!val) return;
+
+            // Priority: data-label → visible label text → raw value
+            const dataLabel   = $(this).data('label');
+            const labelText   = $('label[for="' + id + '"]').text().trim();
+            const displayName = dataLabel || labelText || val;
+
+            hasAny = true;
+            chips += `<span class="chip" data-name="${name}">
+                ${displayName}
+                <button class="chip-remove" data-name="${name}" title="Remove">×</button>
+            </span>`;
         });
 
         $('#applied-chips').html(chips);
@@ -753,7 +775,7 @@ $(document).ready(function () {
         applyFilters();
     });
 
-    // ── Init count ────────────────────────────────────────────
+    // ── Init count (no chips on load since all radios are cleared) ──
     updateCount();
     updateChips();
 });

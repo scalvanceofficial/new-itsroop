@@ -41,12 +41,7 @@ class AuthenticatedSessionController extends Controller
                     'otp_expires_at' => now()->addMinutes(5),
                 ]);
 
-                try {
-                    \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($otp));
-                } catch (\Exception $e) {
-                    \Log::error("Failed to send admin OTP to $user->email: " . $e->getMessage());
-                    return back()->withErrors(['email' => 'Failed to send OTP. Please check mail configuration. Error: ' . $e->getMessage()]);
-                }
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($otp));
 
                 // Store email in session for verification
                 session(['admin_login_email' => $user->email]);

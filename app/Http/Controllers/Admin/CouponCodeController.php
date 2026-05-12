@@ -50,7 +50,10 @@ class CouponCodeController extends Controller
             })
             ->addColumn('action', function ($couponcode) {
                 $edit = '<a href="' . route('admin.coupon-codes.edit', ['coupon_code' => $couponcode->id]) . '" class="badge bg-warning fs-1"><i class="fa fa-edit"></i></a>';
-                return $edit;
+                $delete = '<a href="#" class="btn btn-danger btn-sm fs-1 couponcode-delete-btn"
+                            data-id="' . $couponcode->id . '">
+                            <i class="fa fa-trash"></i></a>';
+                return $edit . ' ' . $delete;
             })
             ->addIndexColumn()
             ->rawColumns(['coupon_code', 'action', 'status', 'start_date', 'end_date', 'percentage', 'minimum_order_amount'])
@@ -153,9 +156,14 @@ class CouponCodeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(CouponCode $couponcode)
     {
-        //
+        $couponcode->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Coupon Code deleted successfully.',
+        ], 200);
     }
 
 

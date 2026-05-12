@@ -106,23 +106,7 @@ class ProductController extends Controller
                 $images = '<a href="' . route('admin.products.images.create', ['product' => $product->id]) . '" class="badge bg-success fs-1" title="images"><i class="fas fa-images"></i></a>';
                 $prices = '<a href="' . route('admin.products.prices.create', ['product' => $product->id]) . '" class="badge bg-secondary fs-1" title="price"><i class="fas fa-rupee-sign"></i></a>';
 
-                $delete = '';
-
-                $usedInCart = Cart::where('product_id', $product->id)->exists();
-                $usedInOrder = OrderProduct::where('product_id', $product->id)->exists();
-
-                if (!$usedInCart && !$usedInOrder) {
-                    $delete = '<a href="#" class="btn btn-danger btn-sm fs-1 product-delete-btn"
-                    data-entity="products" 
-                    data-title="Product"
-                    data-id="' . $product->id . '">
-                    <i class="fa fa-trash"></i></a>';
-                } else {
-                    $delete = '<span class="btn btn-secondary btn-sm fs-1" style="text-decoration: line-through;" title="Product in use — cannot delete">
-                    <i class="fa fa-trash-alt"></i>
-                  </span>';
-                }
-                return $edit . ' ' . $images . ' ' . $prices . ' ' . $delete;
+                return $edit . ' ' . $images . ' ' . $prices;
             })
 
             ->filterColumn('name', function ($query, $keyword) {
@@ -314,6 +298,7 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        \Log::info('ProductController@destroy called', ['product_id' => $product->id]);
         $product->delete();
 
         return response()->json([

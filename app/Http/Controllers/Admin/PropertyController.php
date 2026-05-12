@@ -70,9 +70,14 @@ class PropertyController extends Controller
             })
 
             ->addColumn('action', function ($property) {
-                return '<a href="' . route('admin.properties.edit', ['property' => $property->route_key]) . '" class="badge bg-warning fs-1">
+                $edit = '<a href="' . route('admin.properties.edit', ['property' => $property->route_key]) . '" class="badge bg-warning fs-1">
                             <i class="fa fa-edit"></i>
                         </a>';
+                $delete = '<a href="#" class="btn btn-danger btn-sm fs-1 property-delete-btn"
+                            data-id="' . $property->id . '"
+                            data-routekey="' . $property->route_key . '">
+                            <i class="fa fa-trash"></i></a>';
+                return $edit . ' ' . $delete;
             })
 
             ->filterColumn('index', function ($query, $keyword) {
@@ -249,6 +254,17 @@ class PropertyController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Index updated successfully.',
+        ], 200);
+    }
+
+    public function destroy(Property $property)
+    {
+        \Log::info('PropertyController@destroy called', ['property_id' => $property->id]);
+        $property->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Property deleted successfully.',
         ], 200);
     }
 

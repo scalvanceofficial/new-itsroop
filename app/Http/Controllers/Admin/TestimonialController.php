@@ -58,7 +58,10 @@ class TestimonialController extends Controller
             })
             ->addColumn('action', function ($testimonial) {
                 $edit = '<a href="' . route('admin.testimonials.edit', ['testimonial' => $testimonial->id]) . '" class="badge bg-warning fs-1"><i class="fa fa-edit"></i></a>';
-                return $edit;
+                $delete = '<a href="#" class="btn btn-danger btn-sm fs-1 testimonial-delete-btn"
+                            data-id="' . $testimonial->id . '">
+                            <i class="fa fa-trash"></i></a>';
+                return $edit . ' ' . $delete;
             })
             ->addIndexColumn()
             ->rawColumns(['name', 'status', 'action', 'index', 'title', 'description', 'image', 'purchase_item'])->setRowId('id')->make(true);
@@ -136,6 +139,19 @@ class TestimonialController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Index updated successfully.',
+        ], 200);
+    }
+
+    public function destroy(Testimonial $testimonial)
+    {
+        if ($testimonial->image) {
+            Storage::disk('public')->delete($testimonial->image);
+        }
+        $testimonial->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Testimonial deleted successfully.',
         ], 200);
     }
 

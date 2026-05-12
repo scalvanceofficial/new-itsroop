@@ -3,6 +3,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class Admin
 {
@@ -13,37 +16,80 @@ class Admin
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        if(!\Auth::user()){
-            \Auth::logout();
-        }
-        if(\Auth::user()->status != 'ACTIVE'){
-            \Auth::logout();
-            return \Redirect::back()->withErrors(['You are not allowed to view this page. Please contact with admin.']);
-        }
-        $allow_user = false;
-        $currentAction = \Route::currentRouteAction();
-        list($controller, $method) = explode('@', $currentAction);
-        $controller = str_replace('App\Http\Controllers\\','',$controller);
-        
-        $permissions = \Auth::user()->getAllPermissions()->pluck('id');
-        $permissions = \App\Models\Permission::whereIn('id',$permissions)->get();
-        foreach($permissions as $permission){
-            if($permission->permissiongroup->controller == $controller){
-                foreach($permission->methods as $permission_method){
-                    if($permission_method == $method){
-                        $allow_user = true;
+        Log::info('Admin Middleware Entry Point', [
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'ajax' => $request->ajax(),
+        ]);
+
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            // 1. SuperAdmin Bypass
+            if ($user->hasRole('SuperAdmin')) {
+                Log::info('Admin Middleware: SuperAdmin Bypass', ['user' => $user->email]);
+                return $next($request);
+            }
+
+            $route = $request->route();
+            if ($route) {
+                $action = $route->getActionName();
+                
+                // Extract controller and method
+                // Expected action format: "App\Http\Controllers\Admin\SliderController@index"
+                $controllerAction = str_replace('App\Http\Controllers\\', '', $action);
+                
+                if (strpos($controllerAction, '@') !== false) {
+                    list($controller, $method) = explode('@', $controllerAction);
+                    
+                    Log::info('Admin Middleware Processing', [
+                        'controller' => $controller,
+                        'method' => $method,
+                        'user' => $user->email
+                    ]);
+
+                    // 2. Permission Check
+                    $permissions = $user->getAllPermissions();
+                    $authorized = false;
+
+                    foreach ($permissions as $permission) {
+                        // Check if the permission's group matches the controller
+                        if ($permission->permissiongroup && $permission->permissiongroup->controller === $controller) {
+                            // Check if the current method is in the allowed methods array
+                            if (is_array($permission->methods) && in_array($method, $permission->methods)) {
+                                $authorized = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!$authorized) {
+                        Log::warning('Admin Middleware Access Denied', [
+                            'user' => $user->email,
+                            'controller' => $controller,
+                            'method' => $method,
+                            'allowed_controllers' => $permissions->map(fn($p) => $p->permissiongroup->controller ?? 'N/A')->unique()->toArray()
+                        ]);
+                        
+                        if ($request->ajax()) {
+                            return response()->json(['status' => 'failed', 'message' => 'Unauthorized access.'], 403);
+                        }
+                        
+                        return abort(403, 'Unauthorized access.');
                     }
                 }
             }
-        }
-        if($allow_user){
             return $next($request);
-        }else{
-            return abort(403);
         }
 
-        return $next($request);
+        Log::warning('Admin Middleware: User not authenticated');
+        
+        if ($request->ajax()) {
+            return response()->json(['status' => 'failed', 'message' => 'Unauthenticated.'], 401);
+        }
+
+        return redirect()->route('admin.login');
     }
 }

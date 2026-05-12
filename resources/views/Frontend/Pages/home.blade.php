@@ -4,50 +4,131 @@
 @endsection
 @section('content')
 
-    <!-- Slider -->
-    <div class="tf-slideshow slider-effect-fade position-relative">
-        <div dir="ltr" class="swiper tf-sw-slideshow" data-preview="1" data-tablet="1" data-mobile="1" data-centered="false"
-            data-space="0" data-loop="true" data-auto-play="false" data-delay="0" data-speed="1000">
+   <style>
+    .tf-slideshow {
+        position: relative;
+        width: 100%;
+    }
 
-            <div class="swiper-wrapper">
+    .wrap-slider {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+    }
 
-                @foreach ($sliders as $slider)
-                    <div class="swiper-slide">
-                        <div class="wrap-slider">
+    .slider-img {
+        width: 100%;
+        height: 600px;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+    }
 
-                            <img src="{{ Storage::url($slider->image) }}" alt="slider-image"
-                                style="width: 100%; height: 600px; object-fit: cover; object-position: center;">
+    .box-content {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        transform: translateY(-50%);
+        z-index: 2;
+    }
 
-                            <div class="box-content">
-                                <div class="container">
+    /* Mobile */
+    @media screen and (max-width: 768px) {
+        .wrap-slider {
+            height: auto;
+        }
 
-                                    <h1 class="fade-item fade-item-1 slider-title">
-                                        {{ $slider->title }}
-                                    </h1>
+        .slider-img {
+            width: 100%;
+            height: auto;
+            max-height: 350px;
+            object-fit: contain;
+            background: #fff;
+        }
 
+        .box-content {
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0 15px;
+        }
 
+        .slider-title {
+            font-size: 20px;
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
 
-                                    <a href="/products"
-                                        class="fade-item fade-item-3 tf-btn btn-fill animate-hover-btn btn-xl radius-3"><span>Shop
-                                            collection</span><i class="icon icon-arrow-right"></i></a>
+        .tf-btn {
+            padding: 10px 18px;
+            font-size: 14px;
+        }
+    }
+  @media only screen and (max-width: 767px) {
+    .tf-slideshow .wrap-slider {
+        height: 319px !important;
+    }
 
-                                </div>
+    @media only screen and (max-width: 500px) {
+    .tf-slideshow .wrap-slider {
+        height: 179px;
+    }
+}
+}
+</style>
+
+<div class="tf-slideshow slider-effect-fade">
+    <div dir="ltr"
+         class="swiper tf-sw-slideshow"
+         data-preview="1"
+         data-tablet="1"
+         data-mobile="1"
+         data-centered="false"
+         data-space="0"
+         data-loop="true"
+         data-auto-play="false"
+         data-delay="0"
+         data-speed="1000">
+
+        <div class="swiper-wrapper">
+
+            @foreach ($sliders as $slider)
+                <div class="swiper-slide">
+                    <div class="wrap-slider">
+
+                        <img src="{{ Storage::url($slider->image) }}"
+                             alt="slider-image"
+                             class="slider-img">
+
+                        <div class="box-content">
+                            <div class="container">
+
+                                <h1 class="fade-item fade-item-1 slider-title">
+                                    {{ $slider->title }}
+                                </h1>
+
+                                <a href="/products"
+                                   class="fade-item fade-item-3 tf-btn btn-fill animate-hover-btn btn-xl radius-3">
+                                    <span>Shop Collection</span>
+                                    <i class="icon icon-arrow-right"></i>
+                                </a>
+
                             </div>
-
                         </div>
+
                     </div>
-                @endforeach
+                </div>
+            @endforeach
 
-            </div>
-        </div>
-
-        <div class="wrap-pagination">
-            <div class="container">
-                <div class="sw-dots sw-pagination-slider justify-content-center"></div>
-            </div>
         </div>
     </div>
 
+    <div class="wrap-pagination">
+        <div class="container">
+            <div class="sw-dots sw-pagination-slider justify-content-center"></div>
+        </div>
+    </div>
+</div>
     <!-- /Slider -->
 
     <div class="tf-marquee bg_yellow-2">
@@ -351,123 +432,7 @@
     </section>
     {{-- greenhouse --}}
 
-    <section class="flat-spacing-6">
-        <div class="flat-title wow fadeInUp" data-wow-delay="0s">
-            <span class="title">Shop the look</span>
-            <p class="sub-title">Inspire and let yourself be inspired, from one unique fashion to another.</p>
-        </div>
-        <div dir="ltr" class="swiper tf-sw-lookbook" data-preview="2" data-tablet="2" data-mobile="1"
-            data-space-lg="0" data-space-md="0">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide" lazy="true">
-                    <div class="wrap-lookbook lookbook-1">
-                        <div class="image">
-                            <img class="lazyload" data-src="/frontend/images/shop/file/lookbook-3.jpg"
-                                src="/frontend/images/shop/file/lookbook-3.jpg" alt="image-lookbook">
-                        </div>
-                        <div class="lookbook-item item-1">
-                            <div class="inner">
-                                <div class="btn-group dropdown dropup dropdown-center">
-                                    <button class="tf-pin-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span></span>
-                                    </button>
-                                    <ul class="dropdown-menu p-0 border-0">
-                                        <li>
-                                            <div class="lookbook-product">
-                                                <a href="#0" class="image">
-                                                    <img class="lazyload"
-                                                        data-src="/frontend/images/shop/products/img-p2.png"
-                                                        src="/frontend/images/shop/products/img-p2.png"
-                                                        alt="lookbook-item">
-                                                </a>
-                                                <div class="content-wrap">
-                                                    <div class="product-title">
-                                                        <a href="#">Jersey thong body</a>
-                                                    </div>
-                                                    <div class="price">{{ toCurrency(112.0) }}</div>
-                                                </div>
-                                                <a href="#quick_view" data-bs-toggle="modal" class=""><i
-                                                        class="icon-view"></i></a>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="lookbook-item item-2">
-                            <div class="inner">
-                                <div class="btn-group dropdown dropup dropdown-center">
-                                    <button class="tf-pin-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span></span>
-                                    </button>
-                                    <ul class="dropdown-menu p-0 border-0">
-                                        <li>
-                                            <div class="lookbook-product">
-                                                <a href="#0" class="image">
-                                                    <img class="lazyload"
-                                                        data-src="/frontend/images/shop/products/img-p4.png"
-                                                        src="/frontend/images/shop/products/img-p4.png" alt="">
-                                                </a>
-                                                <div class="content-wrap">
-                                                    <div class="product-title">
-                                                        <a href="#">Ribbed modal T-shirt</a>
-                                                    </div>
-                                                    <div class="price">{{ toCurrency(20.0) }}</div>
-                                                </div>
-                                                <a href="#quick_view" data-bs-toggle="modal" class=""><i
-                                                        class="icon-view"></i></a>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-slide" lazy="true">
-                    <div class="wrap-lookbook lookbook-2">
-                        <div class="image">
-                            <img class="lazyload" data-src="/frontend/images/shop/file/lookbook-4.jpg"
-                                src="/frontend/images/shop/file/lookbook-4.jpg" alt="image-lookbook">
-                        </div>
-                        <div class="lookbook-item item-1">
-                            <div class="inner">
-                                <div class="btn-group dropdown dropup dropdown-center">
-                                    <button class="tf-pin-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span></span>
-                                    </button>
-                                    <ul class="dropdown-menu p-0 border-0">
-                                        <li>
-                                            <div class="lookbook-product">
-                                                <a href="#0" class="image">
-                                                    <img class="lazyload"
-                                                        data-src="/frontend/images/shop/products/img-p5.png"
-                                                        src="/frontend/images/shop/products/img-p5.png" alt="">
-                                                </a>
-                                                <div class="content-wrap">
-                                                    <div class="product-title">
-                                                        <a href="#">Ribbed Tank Top</a>
-                                                    </div>
-                                                    <div class="price">{{ toCurrency(20.0) }}</div>
-                                                </div>
-                                                <a href="#quick_view" data-bs-toggle="modal" class=""><i
-                                                        class="icon-view"></i></a>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="wrap-pagination">
-                <div class="container-full">
-                    <div class="sw-dots sw-pagination-lookbook justify-content-center"></div>
-                </div>
-            </div>
-        </div>
-    </section>
+    
 
 
     <!-- Testimonial -->

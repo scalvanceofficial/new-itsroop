@@ -64,6 +64,32 @@
             </div>
         </div>
     </section>
+    <div id="deleteTestimonialModal" class="modal fade" tabindex="-1" aria-labelledby="deleteTestimonialModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="deleteTestimonialModalLabel">Delete Testimonial
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>Are you sure you want to delete this Testimonial?</h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form action="#" method="POST" id="deleteTestimonialForm">
+                        {{ method_field('DELETE') }}
+                        @csrf
+                        <input type="hidden" name="deleteTestimonialId" id="deleteTestimonialId">
+                        <button type="submit" class="btn btn-danger" id="testideletesubmit-btn">
+                            <span class="delete-spinner-span"></span> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" id="updateIndexModal" tabindex="-1" role="dialog" aria-labelledby="updateIndexModalLabel"
         aria-hidden="true">
@@ -262,6 +288,62 @@
 
                 error: function(data) {
                     toastr.error('Something went wrong!');
+                }
+            });
+        });
+
+        $(document).on('click', '.testimonial-delete-btn', function(e) {
+            var id = $(this).data('id');
+
+            $('#deleteTestimonialId').val(id);
+            $('#deleteTestimonialModal').modal('show');
+        });
+
+        $('#deleteTestimonialForm').submit(function(e) {
+            e.preventDefault();
+
+            $('#testideletesubmit-btn').attr('disabled', true);
+            $('.delete-spinner-span').addClass('spinner-border spinner-border-sm');
+
+            var deleteTestimonialId = $('#deleteTestimonialId').val();
+
+            $.ajax({
+                url: '/admin/testimonials/' + deleteTestimonialId,
+                type: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.status === 'success') {
+                        toastr.success(response.message, '', {
+                            showMethod: "slideDown",
+                            hideMethod: "slideUp",
+                            timeOut: 1500,
+                            closeButton: true,
+                        });
+
+                        $('#deleteTestimonialModal').modal('hide');
+                        $('#datatable').DataTable().ajax.reload(null, false);
+                    } else {
+                        toastr.error('There was an error deleting the Testimonial.', '', {
+                            showMethod: "slideDown",
+                            hideMethod: "slideUp",
+                            timeOut: 1500,
+                            closeButton: true,
+                        });
+                    }
+
+                    $('#testideletesubmit-btn').attr('disabled', false);
+                    $('.delete-spinner-span').removeClass('spinner-border spinner-border-sm');
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Something went wrong. Please try again.', '', {
+                        showMethod: "slideDown",
+                        hideMethod: "slideUp",
+                        timeOut: 1500,
+                        closeButton: true,
+                    });
+
+                    $('#testideletesubmit-btn').attr('disabled', false);
+                    $('.delete-spinner-span').removeClass('spinner-border spinner-border-sm');
                 }
             });
         });

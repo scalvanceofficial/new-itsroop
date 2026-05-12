@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
+if (!defined('DS')) {
+    define('DS', DIRECTORY_SEPARATOR);
+}
+
 class RouteServiceProvider extends ServiceProvider
 {
     /**
@@ -17,9 +21,10 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/admin/dashboard';
+    public const HOME = '/dashboard';
+
     /**
-     * Define your route model bindings, pattern filters, and other route configuration.
+     * Define your route model bindings, pattern filters, etc.
      *
      * @return void
      */
@@ -35,9 +40,13 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
 
-            $this->registerRouteBinding(app_path() . DS . 'Models', 'App\\Models\\');
-
+            Route::middleware('web')
+                ->prefix('admin')
+                ->name('admin.')
+                ->group(base_path('routes/backend.php'));
         });
+
+        $this->registerRouteBinding(app_path() . DS . 'Models', 'App\\Models\\');
     }
 
     /**
@@ -51,45 +60,6 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
     }
-
-    public function map()
-    {
-        $this->mapApiRoutes();
-
-        $this->mapWebRoutes();
-
-        //
-    }
-
-    /**
-     * Define the "web" routes for the application.
-     *
-     * These routes all receive session state, CSRF protection, etc.
-     *
-     * @return void
-     */
-    protected function mapWebRoutes()
-    {
-        Route::middleware('web')
-            ->namespace($this->namespace)
-            ->group(base_path('routes/web.php'));
-    }
-
-    /**
-     * Define the "api" routes for the application.
-     *
-     * These routes are typically stateless.
-     *
-     * @return void
-     */
-    protected function mapApiRoutes()
-    {
-        Route::prefix('api')
-            ->middleware('api')
-            ->namespace($this->namespace)
-            ->group(base_path('routes/api.php'));
-    }
-
 
     /**
      * @return mixed
@@ -111,11 +81,11 @@ class RouteServiceProvider extends ServiceProvider
             }
 
             $key = snake_case(basename($class, '.php'));
-
             $classname = $namespace . basename($class, '.php');
 
             try {
-                Route::bind($key, function ($value, $route = null) use ($classname, $key) {
+                Route::bind($key, function ($value) use ($classname, $key) {
+                    \Log::info('Route::bind triggered', ['key' => $key, 'value' => $value, 'classname' => $classname]);
                     return $this->getModel($classname, $value);
                 });
             } catch (\Exception $e) {
@@ -124,21 +94,24 @@ class RouteServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * @param $model
-     * @param $routeKey
-     * @return mixed
-     */
-    private function getModel($model, $routeKey)
+    private function getModel($class, $routeKey)
     {
+        $model = "App\\Models\\" . basename($class, '.php');
+        \Log::info('getModel attempting resolution', ['model' => $model, 'routeKey' => $routeKey]);
+
         if (!is_numeric($routeKey)) {
-            $routeKey = \Hashids::connection($model)->decode($routeKey)[0] ?? null;
+            $decoded = \Hashids::connection($model)->decode($routeKey);
+            $routeKey = $decoded[0] ?? null;
+            \Log::info('getModel decoded hashid', ['decoded' => $decoded, 'finalKey' => $routeKey]);
         }
-        $modelInstance = resolve($model);
-        try {
-            return $modelInstance->withTrashed()->findOrFail($routeKey);
-        } catch (\BadMethodCallException $e) {
-            return $modelInstance->findOrFail($routeKey);
+
+        if ($routeKey) {
+            $resolved = $model::findOrFail($routeKey);
+            \Log::info('getModel resolved successfully', ['id' => $resolved->id]);
+            return $resolved;
         }
+
+        \Log::warning('getModel failed to resolve', ['model' => $model, 'routeKey' => $routeKey]);
+        return abort(404);
     }
 }

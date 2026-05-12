@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\ReturnProductController;
 use App\Http\Controllers\Admin\ReturnStatusLogController;
 use App\Http\Controllers\Admin\VisitorLogController;
+use App\Http\Controllers\Admin\GalleryController;
 
 //End of use statements
 
@@ -212,6 +213,10 @@ Route::middleware(['auth', 'admin', 'preventBackHistory'])->group(function () {
         Route::resource('coupon-codes', CouponCodeController::class);
         Route::post('coupon-codes/data', [CouponCodeController::class, 'data'])->name('coupon-codes.data');
         Route::post('coupon-codes/change-status', [CouponCodeController::class, 'changeStatus'])->name('coupon-codes.change.status');
+
+        // Galleries
+        Route::resource('galleries', GalleryController::class);
+        Route::post('galleries/data', [GalleryController::class, 'data'])->name('galleries.data');
 
         // visitorlogs
         Route::resource('visitorlog', VisitorLogController::class);

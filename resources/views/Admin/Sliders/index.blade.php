@@ -73,6 +73,7 @@
                     </div>
                 </div>
             </div>
+        </div>
     </section>
 
     <div class="modal fade" id="updateIndexModal" tabindex="-1" role="dialog" aria-labelledby="updateIndexModalLabel"
@@ -105,6 +106,8 @@
                 </div>
             </div>
         </div>
+    </div>
+
     </div>
 
     <script type="text/javascript">
@@ -220,53 +223,99 @@
                     }
                 });
             });
-        })
 
-        $(document).on('click', '.sliderIndexBtn', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-            var index = $(this).data('index');
+            $(document).on('click', '.sliderIndexBtn', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                var index = $(this).data('index');
 
-            $('#updateIndexModal').modal('show');
-            $('#sliderId').val(id);
-            $("#indexDropdown").val(index).val(index);
-        });
+                $('#updateIndexModal').modal('show');
+                $('#sliderId').val(id);
+                $("#indexDropdown").val(index).val(index);
+            });
 
-        $(document).on('change', '.slider-status-switch', function(e) {
-            e.preventDefault();
-            var routeKey = $(this).data('routekey');
-            var status = $(this).is(':checked') ? 'ACTIVE' : 'INACTIVE';
-            $.ajax({
-                url: "{{ route('admin.sliders.change.status') }}",
-                type: 'POST',
-                data: {
-                    _token: $('meta[name=csrf-token]').attr('content'),
-                    route_key: routeKey,
-                    status: status
-                },
-                success: function(data) {
-                    if (data.status == 'success') {
-                        toastr.success(data.message, '', {
-                            showMethod: "slideDown",
-                            hideMethod: "slideUp",
-                            timeOut: 1500,
-                            closeButton: true,
-                        });
-                        if ($.fn.DataTable.isDataTable("#datatable")) {
-                            $('#datatable').DataTable().draw(false);
+            $(document).on('change', '.slider-status-switch', function(e) {
+                e.preventDefault();
+                var routeKey = $(this).data('routekey');
+                var status = $(this).is(':checked') ? 'ACTIVE' : 'INACTIVE';
+                $.ajax({
+                    url: "{{ route('admin.sliders.change.status') }}",
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name=csrf-token]').attr('content'),
+                        route_key: routeKey,
+                        status: status
+                    },
+                    success: function(data) {
+                        if (data.status == 'success') {
+                            toastr.success(data.message, '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
+                            if ($.fn.DataTable.isDataTable("#datatable")) {
+                                $('#datatable').DataTable().draw(false);
+                            }
+                        } else {
+                            toastr.error(data.message, '', {
+                                showMethod: "slideDown",
+                                hideMethod: "slideUp",
+                                timeOut: 1500,
+                                closeButton: true,
+                            });
                         }
-                    } else {
-                        toastr.error(data.message, '', {
+                    },
+                    error: function(data) {
+                        toastr.error('Something went wrong!');
+                    }
+                });
+            });
+
+            $(document).on('click', '.slider-delete-btn', function(e) {
+                e.preventDefault();
+                var deleteSliderId = $(this).attr('data-routekey');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return $.ajax({
+                            url: '{{ route('admin.sliders.destroy', ['slider' => 'PLACEHOLDER']) }}'.replace('PLACEHOLDER', deleteSliderId),
+                            type: "POST",
+                            data: {
+                                _method: 'DELETE',
+                                _token: $('meta[name="csrf-token"]').attr('content')
+                            }
+                        }).then(response => {
+                            console.log('Delete response:', response);
+                            if (response.status !== 'success') {
+                                throw new Error(response.message || 'There was an error deleting the Slider.');
+                            }
+                            return response;
+                        }).catch(error => {
+                            console.error('Delete error:', error);
+                            Swal.showValidationMessage(`Request failed: ${error}`);
+                        });
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        toastr.success(result.value.message, '', {
                             showMethod: "slideDown",
                             hideMethod: "slideUp",
                             timeOut: 1500,
                             closeButton: true,
                         });
+                        $('#datatable').DataTable().ajax.reload(null, false);
                     }
-                },
-                error: function(data) {
-                    toastr.error('Something went wrong!');
-                }
+                });
             });
         });
     </script>
