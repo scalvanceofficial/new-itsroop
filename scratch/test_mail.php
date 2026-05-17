@@ -9,7 +9,7 @@ $kernel->bootstrap();
 
 try {
     Mail::raw('This is a test email from Itsroop.', function ($message) {
-        $message->to('itsroop@outlook.com')->subject('Itsroop');
+        $message->to('info@itsroop.com')->subject('ITSROOP Mail');
     });
     echo "Email sent successfully!\n";
 } catch (\Exception $e) {

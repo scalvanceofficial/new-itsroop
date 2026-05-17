@@ -80,7 +80,7 @@ class EnquiryController extends Controller
         $enquiry->save();
 
         // Send email to admin
-        $adminEmail = env('ADMIN_EMAIL', config('mail.from.address', 'itsroop@outlook.com'));
+        $adminEmail = env('ADMIN_EMAIL', config('mail.from.address', 'info@itsroop.com'));
         EmailService::sendEmail($adminEmail, 'emails.enquiry', [
             'subject' => 'New Enquiry Received',
             'name' => $request->first_name . ' ' . $request->last_name,

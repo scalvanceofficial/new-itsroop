@@ -21,8 +21,8 @@ class ContactMail extends Mailable
     public function build()
     {
         return $this->markdown('emails.contact')
-            ->from("itsroop@outlook.com", "Itsroop")
-            ->subject("Itsroop - New Enquiry Received")
+            ->from("info@itsroop.com", "ITSROOP")
+            ->subject("ITSROOP - New Enquiry Received")
             ->with([
                 'data' => $this->data // Pass the data array to the markdown view
             ]);
