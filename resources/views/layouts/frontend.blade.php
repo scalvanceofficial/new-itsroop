@@ -241,8 +241,8 @@
                                                                                     @endphp
                                                                                     @if($hoverImage)
                                                                                         <img class="lazyload img-hover"
-                                                                                            data-src="{{ \Storage::url($hoverImage->image) }}"
-                                                                                            src="{{ \Storage::url($hoverImage->image) }}"
+                                                                                            data-src="{{ asset(\Storage::url($hoverImage->image)) }}"
+                                                                                            src="{{ asset(\Storage::url($hoverImage->image)) }}"
                                                                                             alt="{{ $product->name }}">
                                                                                     @endif
                                                                                 </a>

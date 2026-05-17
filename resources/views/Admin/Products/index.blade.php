@@ -35,7 +35,7 @@
                                 </fieldset>
                             </div>
                             <div class="col-3 d-flex justify-content-end gap-2">
-                                <a href="{{ route('export.products') }}" class="btn btn-primary">
+                                <a href="{{ route('admin.export.products') }}" class="btn btn-primary">
                                     <i class="fas fa-file-excel"></i>
                                     <span>Export</span>
                                 </a>

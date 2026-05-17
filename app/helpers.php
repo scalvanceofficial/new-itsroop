@@ -374,7 +374,7 @@ function getCartData($cart)
 
     $data = [
         'price' => $product_price ? $product_price->selling_price : 0,
-        'image' => Storage::url($product_image),
+        'image' => asset(Storage::url($product_image)),
         'property_values' => implode(' / ', $property_values),
     ];
 

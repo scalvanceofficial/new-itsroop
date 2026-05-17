@@ -172,7 +172,7 @@ class Product extends BaseModel
                         ->first();
 
                     if ($product_image) {
-                        return Storage::url($product_image->image);
+                        return asset(Storage::url($product_image->image));
                     }
                 }
             }
@@ -183,7 +183,7 @@ class Product extends BaseModel
             ->first();
 
         if ($product_image) {
-            return Storage::url($product_image->image);
+            return asset(Storage::url($product_image->image));
         }
     }
 

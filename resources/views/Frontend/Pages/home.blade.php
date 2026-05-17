@@ -96,7 +96,7 @@
                 <div class="swiper-slide">
                     <div class="wrap-slider">
 
-                        <img src="{{ Storage::url($slider->image) }}"
+                        <img src="{{ asset(Storage::url($slider->image)) }}"
                              alt="slider-image"
                              class="slider-img">
 
@@ -262,8 +262,8 @@
                                             <a href="{{ route('frontend.products', ['category_slug' => $category->slug]) }}"
                                                 class="collection-image img-style">
 
-                                                <img class="lazyload" data-src="{{ Storage::url($category->image) }}"
-                                                    src="{{ Storage::url($category->image) }}"
+                                                <img class="lazyload" data-src="{{ asset(Storage::url($category->image)) }}"
+                                                    src="{{ asset(Storage::url($category->image)) }}"
                                                     alt="{{ $category->name }}">
                                             </a>
 

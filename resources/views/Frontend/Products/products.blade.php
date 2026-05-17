@@ -24,7 +24,8 @@
 
     /* ── Page Header ── */
     .itsroop-header {
-        padding: 52px 0 28px;
+        padding: 48px 0 32px;
+        margin-top: 20px;           /* breathing room below the nav */
         text-align: center;
     }
     .itsroop-header h1 {
@@ -45,7 +46,8 @@
         display: flex;
         gap: 10px;
         overflow-x: auto;
-        padding: 0 0 12px;
+        padding: 8px 18px 16px;        /* more top padding, more bottom clearance */
+        margin-bottom: 12px;        /* extra gap before the filter toggle / layout */
         scrollbar-width: none;
     }
     .cat-scroll::-webkit-scrollbar { display: none; }
@@ -75,17 +77,19 @@
     }
     .cat-pill.active span { color: var(--sage); font-weight: 600; }
 
-    /* ── Layout ── */
+    /* ── Shop layout bottom clearance ── */
     .shop-layout {
         display: grid;
         grid-template-columns: 272px 1fr;
         gap: 28px;
         align-items: start;
+        padding-bottom: 60px;       /* space above the footer */
     }
     @media (max-width: 991px) {
-        .shop-layout { grid-template-columns: 1fr; }
-        .filter-sidebar { display: none; }
-        .filter-sidebar.open { display: block; }
+        /* On mobile: products take full width, sidebar is an overlay */
+        .shop-layout {
+            grid-template-columns: 1fr;
+        }
     }
 
     /* ── Filter Sidebar ── */
@@ -96,7 +100,71 @@
         padding: 24px 20px;
         position: sticky;
         top: 90px;
+        /* Constrain height so sidebar never bleeds into the footer */
+        max-height: calc(100vh - 110px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--dust) transparent;
     }
+    .filter-sidebar::-webkit-scrollbar { width: 4px; }
+    .filter-sidebar::-webkit-scrollbar-track { background: transparent; }
+    .filter-sidebar::-webkit-scrollbar-thumb { background: var(--dust); border-radius: 4px; }
+
+    /* ── Mobile: sidebar becomes a full-screen slide-in drawer ── */
+    @media (max-width: 991px) {
+        .filter-sidebar {
+            /* Hidden off-screen to the left by default */
+            display: block !important;           /* override the old display:none */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: min(320px, 88vw);
+            height: 100%;
+            overflow-y: auto;
+            z-index: 1050;
+            border-radius: 0;
+            padding: 20px 18px 100px;
+            transform: translateX(-110%);        /* slide out of view */
+            transition: transform .3s cubic-bezier(.4,0,.2,1);
+            box-shadow: 4px 0 32px rgba(0,0,0,.18);
+        }
+        .filter-sidebar.open {
+            transform: translateX(0);            /* slide in */
+        }
+    }
+
+    /* ── Backdrop (mobile only) ── */
+    #filter-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        z-index: 1049;
+        backdrop-filter: blur(2px);
+    }
+    #filter-backdrop.show { display: block; }
+
+    /* ── Close button inside sidebar (mobile only) ── */
+    .btn-close-sidebar {
+        display: none;
+        width: 100%;
+        margin-bottom: 18px;
+        padding: 11px 14px;
+        background: var(--sage);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius);
+        font-size: .88rem;
+        font-weight: 600;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    @media (max-width: 991px) {
+        .btn-close-sidebar { display: flex; }
+    }
+
     .filter-sidebar-header {
         display: flex;
         align-items: center;
@@ -393,6 +461,9 @@
 {{-- Loading Overlay --}}
 <div id="filter-loading"><div class="spinner"></div></div>
 
+{{-- Mobile Filter Backdrop --}}
+<div id="filter-backdrop"></div>
+
 <div class="itsroop-header">
     <h1>New Arrivals</h1>
     <p>Shop through our latest selection of fashion</p>
@@ -405,7 +476,7 @@
         @foreach ($product_categories as $category)
             <a href="{{ route('frontend.products', ['category_slug' => $category->slug]) }}"
                class="cat-pill {{ isset($selected_category_slug) && $selected_category_slug === $category->slug ? 'active' : '' }}">
-                <img src="{{ Storage::url($category->image) }}" alt="{{ $category->name }}">
+                <img src="{{ asset(Storage::url($category->image)) }}" alt="{{ $category->name }}">
                 <span>{{ $category->name }}</span>
             </a>
         @endforeach
@@ -423,6 +494,15 @@
 
         {{-- ── Filter Sidebar ── --}}
         <aside class="filter-sidebar" id="filter-sidebar">
+
+            {{-- Close button: visible on mobile only --}}
+            <button class="btn-close-sidebar" id="close-filter-sidebar">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Close Filters
+            </button>
+
             <div class="filter-sidebar-header">
                 <h3>Filters</h3>
                 <button class="btn-clear-all" id="btn-clear-all">Clear all</button>
@@ -465,7 +545,6 @@
                             <div class="swatch-group">
                                 @foreach ($property_values as $pv)
                                     <div class="swatch-wrap" title="{{ $pv->name }}">
-                                        {{-- FIX: added data-label="{{ $pv->name }}" so chips show the correct color name --}}
                                         <input type="radio" name="{{ $property->label }}"
                                                class="pill-input property-value color-radio"
                                                id="color_{{ $pv->id }}"
@@ -489,7 +568,6 @@
                         <div class="fg-body" style="max-height:200px">
                             <div class="pill-group">
                                 @foreach ($property_values as $pv)
-                                    {{-- FIX: added data-label="{{ $pv->name }}" so chips show the correct property name --}}
                                     <input type="radio" name="{{ $property->label }}"
                                            class="pill-input property-value"
                                            id="prop_{{ $pv->id }}"
@@ -653,9 +731,7 @@
 <script>
 $(document).ready(function () {
 
-    // ── FIX: Clear any stale/ghost checked states on page load ──
-    // This prevents "Orange", "S" or any leftover radio selections
-    // from showing as chips when no filter was actually applied.
+    // ── Clear any stale/ghost checked states on page load ──
     $('input[type="radio"]').prop('checked', false);
 
     // ── Collapsible filter groups ──────────────────────────────
@@ -663,9 +739,18 @@ $(document).ready(function () {
         $(this).closest('.fg').toggleClass('collapsed');
     });
 
-    // ── Mobile sidebar toggle ──────────────────────────────────
+    // ── Mobile sidebar open ────────────────────────────────────
     $('#mobile-filter-toggle').on('click', function () {
-        $('#filter-sidebar').toggleClass('open');
+        $('#filter-sidebar').addClass('open');
+        $('#filter-backdrop').addClass('show');
+        $('body').css('overflow', 'hidden'); // prevent background scroll
+    });
+
+    // ── Mobile sidebar close (button or backdrop tap) ──────────
+    $('#close-filter-sidebar, #filter-backdrop').on('click', function () {
+        $('#filter-sidebar').removeClass('open');
+        $('#filter-backdrop').removeClass('show');
+        $('body').css('overflow', '');
     });
 
     // ── Core filter function ───────────────────────────────────
@@ -721,9 +806,6 @@ $(document).ready(function () {
     }
 
     // ── Applied filter chips ──────────────────────────────────
-    // FIX: Use data-label attribute first, which is always set correctly
-    // on every radio input. This prevents wrong names (like "Orange", "S")
-    // from showing up due to missing label text on color swatch radios.
     function updateChips() {
         let chips  = '';
         let hasAny = false;
@@ -735,7 +817,6 @@ $(document).ready(function () {
 
             if (!val) return;
 
-            // Priority: data-label → visible label text → raw value
             const dataLabel   = $(this).data('label');
             const labelText   = $('label[for="' + id + '"]').text().trim();
             const displayName = dataLabel || labelText || val;
@@ -775,7 +856,7 @@ $(document).ready(function () {
         applyFilters();
     });
 
-    // ── Init count (no chips on load since all radios are cleared) ──
+    // ── Init count ────────────────────────────────────────────
     updateCount();
     updateChips();
 });

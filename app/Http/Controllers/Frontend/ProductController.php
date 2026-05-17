@@ -139,7 +139,7 @@ class ProductController extends Controller
                         ->where('property_value_id', $property_value['property_value_id'])
                         ->pluck('image')
                         ->map(function ($image) {
-                            return Storage::url($image); // Prepend the storage URL
+                            return asset(Storage::url($image)); // Prepend the storage URL
                         });
                 }
             }

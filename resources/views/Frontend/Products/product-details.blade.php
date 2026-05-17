@@ -452,8 +452,8 @@
                                         @foreach ($product_images as $product_image)
                                             <div class="swiper-slide" data-color="white">
                                                 <div class="item">
-                                                    <img class="lazyload" src="{{ Storage::url($product_image->image) }}"
-                                                        data-src="{{ Storage::url($product_image->image) }}"
+                                                    <img class="lazyload" src="{{ asset(Storage::url($product_image->image)) }}"
+                                                        data-src="{{ asset(Storage::url($product_image->image)) }}"
                                                         alt="img-product">
                                                 </div>
                                             </div>
@@ -462,7 +462,7 @@
                                             <div class="swiper-slide video-thumb-slide">
                                                 <div class="item">
                                                     <video playsinline autoplay preload="metadata" muted loop
-                                                        src="{{ Storage::url($product->video) }}"
+                                                        src="{{ asset(Storage::url($product->video)) }}"
                                                         style="width:100%;height:100%;object-fit:cover;"></video>
                                                 </div>
                                             </div>
@@ -495,11 +495,11 @@
                                     <div class="swiper-wrapper">
                                         @foreach ($product_images as $product_image)
                                             <div class="swiper-slide" data-color="beige">
-                                                <a href="{{ Storage::url($product_image->image) }}" class="item"
+                                                <a href="{{ asset(Storage::url($product_image->image)) }}" class="item"
                                                     data-pswp-width="770" data-pswp-height="1075">
-                                                    <img class="lazyload" src="{{ Storage::url($product_image->image) }}"
-                                                        data-zoom="{{ Storage::url($product_image->image) }}"
-                                                        data-src="{{ Storage::url($product_image->image) }}" alt="">
+                                                    <img class="lazyload" src="{{ asset(Storage::url($product_image->image)) }}"
+                                                        data-zoom="{{ asset(Storage::url($product_image->image)) }}"
+                                                        data-src="{{ asset(Storage::url($product_image->image)) }}" alt="">
                                                 </a>
                                             </div>
                                         @endforeach
@@ -507,7 +507,7 @@
                                             <div class="swiper-slide video-main-slide">
                                                 <div class="item">
                                                     <video playsinline autoplay preload="metadata" muted controls loop
-                                                        src="{{ Storage::url($product->video) }}"></video>
+                                                        src="{{ asset(Storage::url($product->video)) }}"></video>
                                                 </div>
                                             </div>
                                         @elseif ($product->video_type === 'youtube_link' && $product->youtube_link)
@@ -719,7 +719,7 @@
                                         @if ($product->video_type === 'video' && $product->video)
                                             <div class="swiper-slide" data-color="beige">
                                                 <video class="w-100" style="max-height:520px;object-fit:cover;" controls>
-                                                    <source src="{{ Storage::url($product->video) }}" type="video/mp4">
+                                                    <source src="{{ asset(Storage::url($product->video)) }}" type="video/mp4">
                                                     Your browser does not support the video tag.
                                                 </video>
                                             </div>
