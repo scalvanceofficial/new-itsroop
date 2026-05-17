@@ -400,26 +400,45 @@ class ProductController extends Controller
 
     public function storeImages(Request $request, Product $product)
     {
-        $product->update(['primary_property_id' => $request->property_id]);
+        try {
+            $product->update(['primary_property_id' => $request->property_id]);
 
-        if ($request->has('images')) {
-            foreach ($request->images as $property_value_id => $product_images) {
-                foreach ($product_images as $image) {
-                    if ($image->isValid()) {
-                        ProductImage::create([
-                            'product_id' => $product->id,
-                            'property_value_id' => $property_value_id,
-                            'image' => Storage::disk('public')->put('product_images', $image),
-                        ]);
+            if ($request->has('images')) {
+                foreach ($request->images as $property_value_id => $product_images) {
+                    foreach ($product_images as $image) {
+                        if ($image->isValid()) {
+                            $path = Storage::disk('public')->put('product_images', $image);
+
+                            \Illuminate\Support\Facades\DB::table('product_images')->insert([
+                                'product_id'        => $product->id,
+                                'property_value_id' => $property_value_id,
+                                'image'             => $path,
+                                'created_by'        => \Illuminate\Support\Facades\Auth::id(),
+                                'updated_by'        => \Illuminate\Support\Facades\Auth::id(),
+                                'created_at'        => now(),
+                                'updated_at'        => now(),
+                            ]);
+                        }
                     }
                 }
             }
-        }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Product images stored successfully.',
-        ], 201);
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Product images stored successfully.',
+            ], 201);
+
+        } catch (\Throwable $e) {
+            \Log::error('storeImages failed: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'trace'      => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Failed to save images: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function destroyImage(Request $request, Product $product)
