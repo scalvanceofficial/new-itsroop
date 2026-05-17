@@ -449,15 +449,25 @@
                                 <!-- Thumbnail Swiper -->
                                 <div class="swiper tf-product-media-thumbs" id="thumbs-swiper" data-direction="vertical">
                                     <div class="swiper-wrapper">
-                                        @foreach ($product_images as $product_image)
+                                        @if ($product_images->isEmpty())
                                             <div class="swiper-slide" data-color="white">
                                                 <div class="item">
-                                                    <img class="lazyload" src="{{ asset(Storage::url($product_image->image)) }}"
-                                                        data-src="{{ asset(Storage::url($product_image->image)) }}"
+                                                    <img class="lazyload" src="{{ $product->getImage() }}"
+                                                        data-src="{{ $product->getImage() }}"
                                                         alt="img-product">
                                                 </div>
                                             </div>
-                                        @endforeach
+                                        @else
+                                            @foreach ($product_images as $product_image)
+                                                <div class="swiper-slide" data-color="white">
+                                                    <div class="item">
+                                                        <img class="lazyload" src="{{ asset(Storage::url($product_image->image)) }}"
+                                                            data-src="{{ asset(Storage::url($product_image->image)) }}"
+                                                            alt="img-product">
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
                                         @if ($product->video_type === 'video' && $product->video)
                                             <div class="swiper-slide video-thumb-slide">
                                                 <div class="item">
@@ -493,16 +503,27 @@
                                 <!-- Main Image Swiper -->
                                 <div class="swiper tf-product-media-main" id="main-swiper">
                                     <div class="swiper-wrapper">
-                                        @foreach ($product_images as $product_image)
+                                        @if ($product_images->isEmpty())
                                             <div class="swiper-slide" data-color="beige">
-                                                <a href="{{ asset(Storage::url($product_image->image)) }}" class="item"
+                                                <a href="{{ $product->getImage() }}" class="item"
                                                     data-pswp-width="770" data-pswp-height="1075">
-                                                    <img class="lazyload" src="{{ asset(Storage::url($product_image->image)) }}"
-                                                        data-zoom="{{ asset(Storage::url($product_image->image)) }}"
-                                                        data-src="{{ asset(Storage::url($product_image->image)) }}" alt="">
+                                                    <img class="lazyload" src="{{ $product->getImage() }}"
+                                                        data-zoom="{{ $product->getImage() }}"
+                                                        data-src="{{ $product->getImage() }}" alt="">
                                                 </a>
                                             </div>
-                                        @endforeach
+                                        @else
+                                            @foreach ($product_images as $product_image)
+                                                <div class="swiper-slide" data-color="beige">
+                                                    <a href="{{ asset(Storage::url($product_image->image)) }}" class="item"
+                                                        data-pswp-width="770" data-pswp-height="1075">
+                                                        <img class="lazyload" src="{{ asset(Storage::url($product_image->image)) }}"
+                                                            data-zoom="{{ asset(Storage::url($product_image->image)) }}"
+                                                            data-src="{{ asset(Storage::url($product_image->image)) }}" alt="">
+                                                    </a>
+                                                </div>
+                                            @endforeach
+                                        @endif
                                         @if ($product->video_type === 'video' && $product->video)
                                             <div class="swiper-slide video-main-slide">
                                                 <div class="item">

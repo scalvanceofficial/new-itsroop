@@ -185,6 +185,15 @@ class Product extends BaseModel
         if ($product_image) {
             return asset(Storage::url($product_image->image));
         }
+
+        // Fallback 1: Return the first available product image regardless of properties
+        $fallback_image = $this->productImages()->first();
+        if ($fallback_image) {
+            return asset(Storage::url($fallback_image->image));
+        }
+
+        // Fallback 2: Return a high-quality, theme-matching SVG data-URI placeholder
+        return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"><rect width="300" height="400" fill="%23F7F4EF"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%231C1C1C" opacity="0.3">ITSROOP</text></svg>';
     }
 
     public function isOutOfStock()

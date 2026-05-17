@@ -145,6 +145,22 @@ class ProductController extends Controller
             }
         }
 
+        // Fallback 1: If no variant-specific images are found, return all available images of the product
+        if ($product_images->isEmpty()) {
+            $product_images = $product->productImages()
+                ->pluck('image')
+                ->map(function ($image) {
+                    return asset(Storage::url($image));
+                });
+        }
+
+        // Fallback 2: If the product has absolutely no images, return our premium inline SVG placeholder
+        if ($product_images->isEmpty()) {
+            $product_images = collect([
+                'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"><rect width="300" height="400" fill="%23F7F4EF"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%231C1C1C" opacity="0.3">ITSROOP</text></svg>'
+            ]);
+        }
+
         return response()->json(['product_images' => $product_images], 200);
     }
 

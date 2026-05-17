@@ -319,12 +319,11 @@
                 <div class="tf-categories-wrap justify-content-center">
                     <div class="tf-categories-container">
                         <div class="collection-content text-center">
-                            <h5 class="text_green-1">Let’s fill your cart with eco-friendly goodness!🍃 </h5>
-                            <p class="mt-3">Looks like you haven’t added anything yet. Why not explore our eco-friendly
-                                collection and fill your cart with green goodness?</p>
+                            <h5 class="text_green-1">Your cart is waiting for amazing solution</h5>
+                            <p class="mt-3">    Your cart is empty right now. Start exploring our collection and add your favorite items to continue shopping.</p>
                             <br>
                             <a href="{{ route('frontend.products') }}"
-                                style="background:#4CAF50; color:#fff; padding:10px 20px; text-decoration:none; border-radius:5px;">
+                                style="background:#000000; color:#fff; padding:10px 20px; text-decoration:none; border-radius:5px;">
                                 Browse Products</a>
                         </div>
                     </div>
