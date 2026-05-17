@@ -113,7 +113,7 @@
                     <div class="tf-categories-container">
                         <div class="collection-content text-center">
                             <h5 class="text_green-1">Your wishlist is waiting for amazing solution</h5>
-                            <p class="mt-3">Your cart is empty right now. Start exploring our collection and add your favorite items to continue shopping.</p>
+                            <p class="mt-3">Your wishlist is empty right now. Start exploring our collection and add your favorite items to continue shopping.</p>
                             <br>
                             <a href="{{ route('frontend.products') }}"
                                 style="background:#000000; color:#fff; padding:10px 20px; text-decoration:none; border-radius:5px;">
