@@ -177,22 +177,32 @@ class PropertyController extends Controller
 
         $property->update($request->all());
 
-        foreach ($request->names as $key => $name) {
-            PropertyValue::updateOrCreate(
-                [
-                    'property_id' => $property->id,
-                    'name' => $name,
-                ],
-                [
-                    'color' => $request->is_color == 'YES' ? ($request->colors[$key] ?? null) : null,
-                    'index' => $request->indexes[$key] ?? 0,
-                    'status' => isset($request->statuses[$key]) ? 'ACTIVE' : 'INACTIVE',
-                    'updated_by' => $user->id,
-                    'updated_at' => now(),
-                    'created_by' => $user->id,
-                    'created_at' => now(),
-                ]
-            );
+        if ($request->names) {
+            // Delete any property values that are no longer in the request
+            $submittedNames = array_values($request->names);
+            PropertyValue::where('property_id', $property->id)
+                ->whereNotIn('name', $submittedNames)
+                ->delete();
+
+            foreach ($request->names as $key => $name) {
+                PropertyValue::updateOrCreate(
+                    [
+                        'property_id' => $property->id,
+                        'name' => $name,
+                    ],
+                    [
+                        'color' => $request->is_color == 'YES' ? ($request->colors[$key] ?? null) : null,
+                        'index' => $request->indexes[$key] ?? 0,
+                        'status' => isset($request->statuses[$key]) ? 'ACTIVE' : 'INACTIVE',
+                        'updated_by' => $user->id,
+                        'updated_at' => now(),
+                        'created_by' => $user->id,
+                        'created_at' => now(),
+                    ]
+                );
+            }
+        } else {
+            PropertyValue::where('property_id', $property->id)->delete();
         }
 
         return response()->json([

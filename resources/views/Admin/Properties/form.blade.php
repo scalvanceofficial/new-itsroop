@@ -99,6 +99,65 @@
 
                     <div class="card-body border-top" id="createValuesBody">
                         <!-- dynamic values -->
+                        @if (isset($property) && $property->propertyValues)
+                            @foreach ($property->propertyValues->sortBy('index') as $val)
+                                <div class="row valueRow mt-2">
+                                    <div class="col-md-12">
+                                        <div style="border:2px solid #5d87ff; padding:10px; border-radius:10px;">
+                                            <div class="row">
+
+                                                <div class="col-md-4">
+                                                    @if ($property->type === 'shirt_size')
+                                                        <select name="names[{{ $val->id }}]" class="form-control" required>
+                                                            <option value="">Select Size</option>
+                                                            <option {{ $val->name == 'S' ? 'selected' : '' }}>S</option>
+                                                            <option {{ $val->name == 'M' ? 'selected' : '' }}>M</option>
+                                                            <option {{ $val->name == 'L' ? 'selected' : '' }}>L</option>
+                                                            <option {{ $val->name == 'XL' ? 'selected' : '' }}>XL</option>
+                                                            <option {{ $val->name == 'XXL' ? 'selected' : '' }}>XXL</option>
+                                                        </select>
+                                                    @elseif ($property->type === 'shoe_size')
+                                                        <select name="names[{{ $val->id }}]" class="form-control" required>
+                                                            <option value="">Select Size</option>
+                                                            @foreach ([5, 6, 7, 8, 9, 10, 11, 12] as $s)
+                                                                <option {{ $val->name == $s ? 'selected' : '' }}>{{ $s }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    @else
+                                                        <input type="text" name="names[{{ $val->id }}]" class="form-control" value="{{ $val->name }}" placeholder="{{ $property->type === 'color' ? 'Color Name' : 'Enter Value' }}" required>
+                                                    @endif
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    @if ($property->is_color == 'YES')
+                                                        <input type="color" name="colors[{{ $val->id }}]" class="form-control form-control-color" value="{{ $val->color }}">
+                                                    @endif
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="form-check form-switch mt-2">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            name="statuses[{{ $val->id }}]" value="ACTIVE" {{ $val->status == 'ACTIVE' ? 'checked' : '' }}>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <input type="number" name="indexes[{{ $val->id }}]"
+                                                        class="form-control" value="{{ $val->index }}" placeholder="Index" required>
+                                                </div>
+
+                                                <div class="col-md-1 d-flex justify-content-end">
+                                                    <button type="button" class="btn btn-danger removeValueBtn">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
 
                     <div class="card-footer">
