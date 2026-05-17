@@ -366,12 +366,32 @@
                                     </a>
                                 @endauth
                             </li>
-                            <li class="nav-wishlist"><a href="/wishlists" class="nav-icon-item"><i
-                                        class="icon icon-heart"></i><span class="count-box wishlist-count"></span></a>
+                            <li class="nav-wishlist">
+                                @auth
+                                    <a href="/wishlists" class="nav-icon-item">
+                                        <i class="icon icon-heart"></i>
+                                        <span class="count-box wishlist-count"></span>
+                                    </a>
+                                @else
+                                    <a href="#login" data-bs-toggle="modal" class="nav-icon-item">
+                                        <i class="icon icon-heart"></i>
+                                        <span class="count-box wishlist-count">0</span>
+                                    </a>
+                                @endauth
                             </li>
-                            <li class="nav-cart"><a href="{{ route('frontend.cart') }}" class="nav-icon-item"><i
-                                        class="fas fa-cart-plus" style="font-size:1.5em;"></i><span
-                                        class="count-box cart-count"></span></a></li>
+                            <li class="nav-cart">
+                                @auth
+                                    <a href="{{ route('frontend.cart') }}" class="nav-icon-item">
+                                        <i class="fas fa-cart-plus" style="font-size:1.5em;"></i>
+                                        <span class="count-box cart-count"></span>
+                                    </a>
+                                @else
+                                    <a href="#login" data-bs-toggle="modal" class="nav-icon-item">
+                                        <i class="fas fa-cart-plus" style="font-size:1.5em;"></i>
+                                        <span class="count-box cart-count">0</span>
+                                    </a>
+                                @endauth
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -610,22 +630,42 @@
             @endauth
         </div>
         <div class="toolbar-item">
-            <a href="{{ route('frontend.wishlists') }}">
-                <div class="toolbar-icon">
-                    <i class="icon-heart"></i>
-                    <div class="count-box wishlist-count toolbar-count">0</div>
-                </div>
-                <div class="toolbar-label">Wishlist</div>
-            </a>
+            @auth
+                <a href="{{ route('frontend.wishlists') }}">
+                    <div class="toolbar-icon">
+                        <i class="icon-heart"></i>
+                        <div class="count-box wishlist-count toolbar-count">0</div>
+                    </div>
+                    <div class="toolbar-label">Wishlist</div>
+                </a>
+            @else
+                <a href="#login" data-bs-toggle="modal">
+                    <div class="toolbar-icon">
+                        <i class="icon-heart"></i>
+                        <div class="count-box wishlist-count toolbar-count">0</div>
+                    </div>
+                    <div class="toolbar-label">Wishlist</div>
+                </a>
+            @endauth
         </div>
         <div class="toolbar-item">
-            <a href="{{ route('frontend.cart') }}">
-                <div class="toolbar-icon">
-                    <i class="fas fa-cart-plus" style="font-size:1.5em;"></i>
-                    <div class="count-box cart-count toolbar-count">0</div>
-                </div>
-                <div class="toolbar-label">Cart</div>
-            </a>
+            @auth
+                <a href="{{ route('frontend.cart') }}">
+                    <div class="toolbar-icon">
+                        <i class="fas fa-cart-plus" style="font-size:1.5em;"></i>
+                        <div class="count-box cart-count toolbar-count">0</div>
+                    </div>
+                    <div class="toolbar-label">Cart</div>
+                </a>
+            @else
+                <a href="#login" data-bs-toggle="modal">
+                    <div class="toolbar-icon">
+                        <i class="fas fa-cart-plus" style="font-size:1.5em;"></i>
+                        <div class="count-box cart-count toolbar-count">0</div>
+                    </div>
+                    <div class="toolbar-label">Cart</div>
+                </a>
+            @endauth
         </div>
     </div>
     <!-- /toolbar-bottom -->
@@ -705,6 +745,7 @@
                         <a href="/contact" class="mb-menu-link">Contact Us</a>
                     </li>
 
+                    @auth
                     <li class="nav-mb-item">
                         <a href="#dropdown-menu-five" class="collapsed mb-menu-link current"
                             data-bs-toggle="collapse" aria-expanded="true" aria-controls="dropdown-menu-five">
@@ -731,8 +772,14 @@
                                 </li>
                             </ul>
                         </div>
-
                     </li>
+                    @else
+                    <li class="nav-mb-item">
+                        <a href="#login" data-bs-toggle="modal" class="mb-menu-link">
+                            <span>My Account</span>
+                        </a>
+                    </li>
+                    @endauth
 
 
                 </ul>
