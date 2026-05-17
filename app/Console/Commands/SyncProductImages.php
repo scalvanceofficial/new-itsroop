@@ -4,39 +4,31 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductPropertyValue;
-use App\Models\User;
 
 class SyncProductImages extends Command
 {
     protected $signature   = 'images:sync {--dry-run : Preview changes without writing to DB}';
-    protected $description = 'Sync orphaned product image files on disk into the product_images database table.';
+    protected $description = 'Fix product primary_property_id and report any image issues.';
 
     public function handle(): int
     {
-        $dryRun = $this->option('dry-run');
-        $admin  = User::first();
+        $dryRun     = $this->option('dry-run');
+        $products   = Product::all();
+        $totalFixed = 0;
 
-        if (!$admin) {
-            $this->error('No users found in database. Aborting.');
-            return 1;
-        }
-
-        $this->info("Running images:sync" . ($dryRun ? ' [DRY RUN]' : '') . "\n");
-
-        $products = Product::all();
+        $this->info("images:sync" . ($dryRun ? ' [DRY RUN]' : '') . "\n");
         $this->info("Scanning {$products->count()} product(s)…\n");
 
-        $totalInserted = 0;
-        $totalFixed    = 0;
+        // All image paths currently stored in DB (across ALL products)
+        $allDbImagePaths = ProductImage::pluck('image')->toArray();
 
         foreach ($products as $product) {
             $this->line("── Product ID:{$product->id}  {$product->name}");
 
-            // ── Fix primary_property_id if NULL ──────────────────────────────
+            // Fix primary_property_id if NULL
             if (empty($product->primary_property_id)) {
                 $primaryPPV = ProductPropertyValue::where('product_id', $product->id)
                     ->where('is_primary', 'YES')
@@ -48,74 +40,44 @@ class SyncProductImages extends Command
                     }
                     $this->line("   ✔ Fixed primary_property_id → {$primaryPPV->property_id}");
                     $totalFixed++;
+                } else {
+                    $this->warn("   ⚠ No primary property value found.");
                 }
+            } else {
+                $this->line("   ✔ primary_property_id = {$product->primary_property_id}");
             }
 
-            // ── Find orphaned disk files ──────────────────────────────────────
-            $existingDbImages = ProductImage::where('product_id', $product->id)
-                ->pluck('image')
-                ->toArray();
-
-            $diskDir   = storage_path('app/public/product_images');
-            $allOnDisk = array_map(
-                fn($f) => 'product_images/' . basename($f),
-                glob("$diskDir/*") ?: []
-            );
-
-            $orphaned = array_values(array_filter(
-                $allOnDisk,
-                fn($f) => !in_array($f, $existingDbImages)
-            ));
-
-            if (empty($orphaned)) {
-                $count = count($existingDbImages);
-                $this->line("   ✅ {$count} image(s) already linked. Nothing to do.");
-                $this->newLine();
-                continue;
-            }
-
-            $this->line("   Found " . count($orphaned) . " orphaned file(s) on disk.");
-
-            // ── Get property values ordered: primary first ────────────────────
-            $ppvs = ProductPropertyValue::where('product_id', $product->id)->get();
-
-            if ($ppvs->isEmpty()) {
-                $this->warn("   ⚠ No property values found — skipping.");
-                $this->newLine();
-                continue;
-            }
-
-            $ordered = $ppvs->sortByDesc(fn($p) => $p->is_primary === 'YES')->values();
-            $pvCount = $ordered->count();
-            $chunks  = array_chunk($orphaned, (int) ceil(count($orphaned) / $pvCount));
-
-            foreach ($chunks as $i => $chunk) {
-                $ppv = $ordered[$i] ?? $ordered->last();
-                foreach ($chunk as $imagePath) {
-                    $this->line("   " . ($dryRun ? '[DRY]' : '') . " INSERT: {$imagePath} → prop_value_id={$ppv->property_value_id}");
-
-                    if (!$dryRun) {
-                        DB::table('product_images')->insert([
-                            'product_id'        => $product->id,
-                            'property_value_id' => $ppv->property_value_id,
-                            'image'             => $imagePath,
-                            'created_by'        => $admin->id,
-                            'updated_by'        => $admin->id,
-                            'created_at'        => now(),
-                            'updated_at'        => now(),
-                        ]);
-                    }
-                    $totalInserted++;
-                }
+            // Report image count
+            $imageCount = ProductImage::where('product_id', $product->id)->count();
+            if ($imageCount > 0) {
+                $this->info("   ✅ {$imageCount} image(s) linked in DB.");
+            } else {
+                $this->warn("   ⚠ No images in DB. Please upload via admin portal:");
+                $this->warn("     → Admin → Products → click Images icon → Upload for each color variant");
             }
 
             $this->newLine();
         }
 
+        // Report orphaned disk files (on disk but not linked to ANY product in DB)
+        $diskDir   = storage_path('app/public/product_images');
+        $allOnDisk = array_map(
+            fn($f) => 'product_images/' . basename($f),
+            glob("$diskDir/*") ?: []
+        );
+        $orphaned = array_values(array_diff($allOnDisk, $allDbImagePaths));
+
+        if (!empty($orphaned)) {
+            $this->warn("════════════════════════════════════");
+            $this->warn("⚠ " . count($orphaned) . " file(s) on disk not linked to any product:");
+            foreach ($orphaned as $path) {
+                $this->warn("   {$path}");
+            }
+            $this->warn("   → Re-upload these via admin portal to link them correctly.");
+        }
+
         $this->info("════════════════════════════════════");
-        $this->info("✅ Done!");
-        $this->info("   Products fixed  : {$totalFixed}");
-        $this->info("   Images inserted : {$totalInserted}" . ($dryRun ? ' (dry run — nothing written)' : ''));
+        $this->info("✅ Done! Products fixed: {$totalFixed}");
 
         return 0;
     }
