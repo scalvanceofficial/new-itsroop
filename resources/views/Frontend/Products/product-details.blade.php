@@ -106,7 +106,8 @@
             .swiper.tf-product-media-main .swiper-slide .item img {
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: contain;
+                background-color: #fff;
             }
 
             .swiper.tf-product-media-main .swiper-slide video,
@@ -195,7 +196,8 @@
             .swiper.tf-product-media-main .swiper-slide .item img {
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: contain;
+                background-color: #fff;
             }
 
             .swiper.tf-product-media-main .swiper-slide video,
@@ -279,7 +281,8 @@
             .swiper.tf-product-media-main .swiper-slide .item img {
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: contain;
+                background-color: #fff;
             }
 
             .swiper.tf-product-media-main .swiper-slide video,
@@ -429,6 +432,20 @@
                 padding-top: 24px !important;
                 padding-bottom: 24px !important;
             }
+        }
+
+        /* ========== COLOR VARIANT PICKER OVERRIDES ========== */
+        .variant-picker-values input.property-value:checked + label.color-variant-label {
+            background-color: #fff !important;
+            border-color: #34634b !important;
+            color: #032F3E !important;
+            border-width: 2px !important;
+            box-shadow: 0 2px 8px rgba(52, 99, 75, 0.15) !important;
+        }
+
+        .variant-picker-values input.property-value:checked + label.color-variant-label .text-title {
+            color: #032F3E !important;
+            font-weight: 600 !important;
         }
     </style>
 
@@ -630,7 +647,7 @@
                                                             data-image-property="{{ $product->primary_property_id == $product_property_value->property_id ? 'YES' : 'NO' }}">
 
                                                         @if ($product_property_value->property->is_color == 'YES')
-                                                            <label class="style-text d-flex align-items-center gap-2" style="padding: 5px 12px;"
+                                                            <label class="style-text color-variant-label d-flex align-items-center gap-2" style="padding: 5px 12px;"
                                                                 for="{{ $product_property_value->id }}"
                                                                 data-value="{{ $product_property_value->propertyValue->name }} - {{ $product_property_value->color_name }}">
                                                                 <span style="display:inline-block; width:16px; height:16px; border-radius:50%; background:{{ $product_property_value->color_code }}; border:1px solid #ccc;"></span>
