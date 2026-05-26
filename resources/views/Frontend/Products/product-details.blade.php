@@ -444,7 +444,7 @@
         }
 
         .variant-picker-values input.property-value:checked + label.color-variant-label .text-title {
-            color: #032F3E !important;
+            color: #ffffff !important;
             font-weight: 600 !important;
         }
     </style>
