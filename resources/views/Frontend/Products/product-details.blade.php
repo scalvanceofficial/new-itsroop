@@ -1027,7 +1027,6 @@
 
             let selectedPropertyValues = getSelectedPropertyValues();
             getProductPrice(selectedPropertyValues);
-            getProductImages(selectedPropertyValues);
 
             $('.property-value').change(function() {
                 let selectedPropertyValues = getSelectedPropertyValues();
@@ -1062,7 +1061,7 @@
                                 showMethod: "slideDown",
                                 timeOut: 1000,
                                 closeButton: true,
-                            });
+                              });
                             setTimeout(function() {
                                 location.reload();
                             }, 1000);
@@ -1151,9 +1150,9 @@
                 slidesPerView: isDesktop ? 'auto' : (w >= 768 ? 5 : 4),
             };
 
-            thumbsSwiper = new Swiper(".tf-product-media-thumbs", thumbConfig);
+            thumbsSwiper = new Swiper("#thumbs-swiper", thumbConfig);
 
-            mainSwiper = new Swiper(".tf-product-media-main", {
+            mainSwiper = new Swiper("#main-swiper", {
                 spaceBetween: 0,
                 observer: true,
                 observeParents: true,
