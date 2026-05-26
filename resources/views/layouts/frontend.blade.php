@@ -76,10 +76,218 @@
             left: 0 !important;
             right: 0 !important;
             width: 100% !important;
-            z-index: 99999 !important;
+            z-index: 1030 !important;
             background-color: white !important;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
             transition: box-shadow 0.3s ease;
+        }
+
+        /* Ensure offcanvas always renders above the sticky header */
+        .offcanvas {
+            z-index: 1050 !important;
+        }
+        .offcanvas-backdrop {
+            z-index: 1040 !important;
+        }
+
+        /* ── Premium Search Overlay ────────────────────────────── */
+        .canvas-search {
+            height: auto !important;
+            max-height: 70vh;
+            overflow-y: auto;
+            border-radius: 0 0 20px 20px !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+            border: none !important;
+            background: #fff !important;
+        }
+
+        .canvas-search-wrapper {
+            padding: 28px 40px 32px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header row */
+        .canvas-search-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+
+        .canvas-search-label {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #888;
+        }
+
+        .canvas-search-close {
+            background: #f4f4f4;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .canvas-search-close:hover {
+            background: #e8e8e8;
+            transform: rotate(90deg);
+        }
+
+        /* Input wrapper */
+        .canvas-search-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border: 2px solid #e8e8e8;
+            border-radius: 14px;
+            padding: 0 20px;
+            background: #fafafa;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .canvas-search-input-wrap:focus-within {
+            border-color: #34634b;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(52,99,75,0.08);
+        }
+
+        .canvas-search-icon {
+            font-size: 18px;
+            color: #999;
+            flex-shrink: 0;
+        }
+
+        .canvas-search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 18px;
+            font-weight: 400;
+            color: #1a1a1a;
+            padding: 18px 0;
+            font-family: inherit;
+        }
+        .canvas-search-input::placeholder {
+            color: #bbb;
+            font-size: 16px;
+        }
+
+        .canvas-search-submit {
+            background: #111;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.15s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .canvas-search-submit:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        /* Search History section */
+        .canvas-search-history {
+            margin-top: 24px;
+        }
+        .canvas-search-history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .canvas-search-trending-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #aaa;
+            margin-bottom: 0;
+        }
+        .canvas-history-clear {
+            background: none;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+        .canvas-history-clear:hover {
+            color: #111;
+        }
+        .canvas-search-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .canvas-search-tag {
+            display: inline-block;
+            padding: 7px 16px;
+            border-radius: 30px;
+            border: 1.5px solid #e5e5e5;
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+            text-decoration: none;
+            background: #fafafa;
+            transition: all 0.2s ease;
+        }
+        .canvas-search-tag:hover {
+            border-color: #111;
+            color: #111;
+            background: #f4f4f4;
+        }
+        .canvas-search-tag--history {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Results area */
+        .canvas-search-results {
+            margin-top: 20px;
+        }
+
+        /* ── Mobile Responsive ─────────────────────────────────── */
+        @media (max-width: 768px) {
+            .canvas-search {
+                max-height: 85vh;
+                border-radius: 0 0 16px 16px !important;
+            }
+            .canvas-search-wrapper {
+                padding: 20px 18px 26px;
+            }
+            .canvas-search-input {
+                font-size: 15px;
+                padding: 15px 0;
+            }
+            .canvas-search-input::placeholder {
+                font-size: 14px;
+            }
+            .canvas-search-submit {
+                padding: 9px 14px;
+                font-size: 13px;
+            }
+            .canvas-search-input-wrap {
+                padding: 0 14px;
+                gap: 10px;
+            }
         }
     </style>
 </head>
