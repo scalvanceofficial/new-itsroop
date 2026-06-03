@@ -70,6 +70,11 @@
     </script>
 
     <style>
+        .text-primary {
+    --bs-text-opacity: 1;
+    color: rgb(0 0 0) !important;
+    font-weight: 700;
+}
         .header-fixed-override {
             position: fixed !important;
             top: 0 !important;
@@ -676,7 +681,7 @@
                                         <a href="{{ route('frontend.privacy-policy') }}" class="footer-menu_item">Privacy Policy</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('frontend.return-and-exchange') }}" class="footer-menu_item"> Returns + Exchanges
+                                        <a href="{{ route('frontend.return-and-exchange') }}" class="footer-menu_item"> Returns And Exchanges
                                         </a>
                                     </li>
                                     <li>

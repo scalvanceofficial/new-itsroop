@@ -76,7 +76,7 @@
             }
 
             .swiper.tf-product-media-thumbs .swiper-slide-thumb-active {
-                border-color: #34634b;
+                border-color: #000000;
             }
 
             .swiper.tf-product-media-thumbs .item img,
@@ -172,7 +172,7 @@
             }
 
             .swiper.tf-product-media-thumbs .swiper-slide-thumb-active {
-                border-color: #34634b;
+                border-color: #000000;
             }
 
             .swiper.tf-product-media-thumbs .item,
@@ -257,7 +257,7 @@
             }
 
             .swiper.tf-product-media-thumbs .swiper-slide-thumb-active {
-                border-color: #34634b;
+                border-color: #000000;
             }
 
             .swiper.tf-product-media-thumbs .item,
@@ -437,7 +437,7 @@
         /* ========== COLOR VARIANT PICKER OVERRIDES ========== */
         .variant-picker-values input.property-value:checked + label.color-variant-label {
             background-color: #fff !important;
-            border-color: #34634b !important;
+            border-color: #000000 !important;
             color: #032F3E !important;
             border-width: 2px !important;
             box-shadow: 0 2px 8px rgba(52, 99, 75, 0.15) !important;
@@ -830,7 +830,7 @@
                                             @endphp
                                             <li class="mb-2">
                                                 <span class="fw-bold fs-16"
-                                                    style="color: #34634b">{{ $property_label }}:</span>
+                                                    style="color: #000000">{{ $property_label }}:</span>
                                                 <span class="text-secondary fs-16"> {{ $values }}</span>
                                             </li>
                                         @endforeach
