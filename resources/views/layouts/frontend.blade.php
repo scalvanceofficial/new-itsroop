@@ -1006,12 +1006,12 @@
                     <ul class="mb-info">
                         {{-- <li>Address: RH No. 43, Grand Kalyan, Opp WALMI, Kanchanwadi, Aurangabad, Maharashtra, India -
                             431136</li> --}}
-                        <li><i class="fas fa-phone" style="margin-right: 8px; color: #36614b;"></i>
+                        <li><i class="fas fa-phone" style="margin-right: 8px; color: #000000;"></i>
                             <a href="tel:+44 0000 000000"><b>
                                     +44
                                     0000 000000</b></a>
                         </li>
-                        <li><i class="fas fa-envelope" style="margin-right: 8px; color: #36614b;"></i><a
+                        <li><i class="fas fa-envelope" style="margin-right: 8px; color: #000000;"></i><a
                                 href="mailto:info@itsroop.com"><b>
                                     info@itsroop.com</b></a>
                         </li>
